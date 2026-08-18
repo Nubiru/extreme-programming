@@ -1,0 +1,24 @@
+# Dependencias e artefactos de build
+node_modules/
+dist/
+coverage/
+
+# Variables de entorno reales (el .env.example sí se versiona)
+.env
+.env.local
+
+# Reportes de los corredores de pruebas
+*.log
+.vitest-cache/
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Material de cátedra con copyright.
+# AgilePG_SPA.pdf es la "Guía Práctica de Ágil" de PMI / Agile Alliance.
+# Queda fuera del repo hasta confirmar que es privado. Para incluirlo:
+#   borrar la línea de abajo y ejecutar  git add -f AgilePG_SPA.pdf
+AgilePG_SPA.pdf

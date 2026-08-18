@@ -1,0 +1,272 @@
+<title>Cuatro fuentes y un guión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  --ground:#F7F8F7; --surface:#FFFFFF; --surface-2:#F1F4F2;
+  --ink:#15201F; --ink-2:#4A5654; --ink-3:#77837F;
+  --rule:#DDE3E0; --rule-strong:#C4CECA;
+  --accent:#0F6A63; --accent-ink:#0B4F49; --accent-soft:#E3EFEC;
+  --ochre:#9A5B14; --ochre-soft:#F5EADB;
+  --shadow:0 1px 2px rgba(21,32,31,.05);
+  --sans:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101413; --surface:#171D1C; --surface-2:#1D2422;
+    --ink:#E8EDEB; --ink-2:#A6B2AE; --ink-3:#7E8B87;
+    --rule:#2A3331; --rule-strong:#3A4441;
+    --accent:#5CC4B5; --accent-ink:#8FDACE; --accent-soft:#14312D;
+    --ochre:#DBA463; --ochre-soft:#332619;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101413; --surface:#171D1C; --surface-2:#1D2422;
+  --ink:#E8EDEB; --ink-2:#A6B2AE; --ink-3:#7E8B87;
+  --rule:#2A3331; --rule-strong:#3A4441;
+  --accent:#5CC4B5; --accent-ink:#8FDACE; --accent-soft:#14312D;
+  --ochre:#DBA463; --ochre-soft:#332619;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:60rem;margin:0 auto;padding:0 1.5rem 6rem}
+.prose{max-width:38rem}
+p{margin:0 0 1rem}
+a{color:var(--accent-ink);text-underline-offset:2px;text-decoration-thickness:1px}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+strong{font-weight:600}
+em{font-style:italic}
+
+h1,h2,h3,h4,.eyebrow,.chip,.tl,th,.mark{font-family:var(--sans)}
+h1{font-size:clamp(2.1rem,5.5vw,3.1rem);line-height:1.06;letter-spacing:-.024em;font-weight:700;margin:.4rem 0 .8rem;text-wrap:balance}
+h2{font-size:clamp(1.4rem,3vw,1.75rem);line-height:1.18;letter-spacing:-.015em;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:1.12rem;line-height:1.3;letter-spacing:-.008em;font-weight:700;margin:0 0 .35rem;text-wrap:balance}
+h4{font-size:.94rem;font-weight:700;margin:1.6rem 0 .5rem;letter-spacing:-.004em}
+
+.eyebrow{font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ---- header ---- */
+header.top{padding:3.5rem 0 2.5rem;border-bottom:1px solid var(--rule)}
+.lede{font-size:1.13rem;color:var(--ink-2);max-width:36rem;margin-top:.2rem}
+.facts{display:flex;flex-wrap:wrap;gap:0 2.25rem;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--rule)}
+.fact{display:flex;flex-direction:column;gap:.15rem;padding:.35rem 0}
+.fact b{font-family:var(--sans);font-size:.95rem;font-weight:600}
+
+/* ---- sections ---- */
+section{padding:3.25rem 0 0}
+.shead{display:flex;flex-direction:column;gap:.5rem;padding-bottom:1.5rem;margin-bottom:1.75rem;border-bottom:2px solid var(--ink)}
+.shead p{margin:.35rem 0 0;color:var(--ink-2);max-width:38rem}
+
+/* ---- chips ---- */
+.chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:600;letter-spacing:.045em;text-transform:uppercase;padding:.25rem .6rem;border-radius:3px;border:1px solid var(--rule-strong);color:var(--ink-2);background:var(--surface-2);white-space:nowrap}
+.chip.oblig{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-soft)}
+.chip.guiada{color:var(--accent-ink);border-color:var(--rule-strong);background:var(--accent-soft)}
+.chip.doc{color:var(--ochre);border-color:var(--ochre);background:var(--ochre-soft)}
+
+/* ---- resource cards ---- */
+.res{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);margin-bottom:1.5rem;overflow:hidden}
+.res.docente{border-left:3px solid var(--ochre)}
+.res.alumno{border-left:3px solid var(--accent)}
+.res-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem;padding:1.35rem 1.5rem 1.1rem;border-bottom:1px solid var(--rule);background:var(--surface-2)}
+.res-h .src{font-family:var(--sans);font-size:.85rem;color:var(--ink-3);margin-top:.2rem;display:block}
+.res-b{padding:1.35rem 1.5rem 1.6rem}
+.res-b > *:first-child{margin-top:0}
+.url{font-family:var(--mono);font-size:.76rem;word-break:break-all}
+
+/* ---- generic blocks ---- */
+ul,ol{margin:0 0 1rem;padding-left:1.15rem}
+li{margin:.3rem 0}
+ul.tight li,ol.tight li{margin:.15rem 0}
+blockquote{margin:1rem 0;padding:.15rem 0 .15rem 1.1rem;border-left:2px solid var(--accent);color:var(--ink-2);font-style:italic}
+blockquote p:last-child{margin-bottom:0}
+blockquote cite{display:block;font-style:normal;font-family:var(--sans);font-size:.8rem;color:var(--ink-3);margin-top:.4rem}
+.note{background:var(--surface-2);border:1px solid var(--rule);border-radius:4px;padding:1rem 1.15rem;margin:1.25rem 0;font-size:.95rem}
+.note.warn{background:var(--ochre-soft);border-color:var(--ochre)}
+.note > *:last-child{margin-bottom:0}
+.note .mark{display:block;font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.35rem}
+.note.warn .mark{color:var(--ochre)}
+
+/* ---- tables ---- */
+.scroll{overflow-x:auto;margin:1.25rem 0;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:38rem;font-family:var(--sans);font-size:.88rem}
+th,td{text-align:left;vertical-align:top;padding:.65rem .85rem;border-bottom:1px solid var(--rule)}
+thead th{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);background:var(--surface-2);border-bottom:1px solid var(--rule-strong);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.n,th.n{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-3);width:2.5rem;white-space:nowrap}
+td b{font-weight:600}
+.yes{color:var(--accent);font-weight:700}
+.no{color:var(--ink-3)}
+
+h3.sub{margin:2.75rem 0 .6rem;font-size:1.08rem}
+
+/* ---- script movements ---- */
+.mv{display:grid;grid-template-columns:5.5rem 1fr;gap:0 1.5rem;padding:1.5rem 0;border-top:1px solid var(--rule)}
+.mv:first-of-type{border-top:2px solid var(--ink)}
+.tl{font-family:var(--mono);font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.02em;padding-top:.25rem;font-variant-numeric:tabular-nums}
+.mv-b > *:first-child{margin-top:0}
+.mv-b > *:last-child{margin-bottom:0}
+.say{border-left:2px solid var(--rule-strong);padding-left:1rem;margin:.85rem 0;color:var(--ink-2)}
+.say .mark{display:block;font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.3rem}
+@media (max-width:640px){
+  .mv{grid-template-columns:1fr;gap:.5rem}
+  .tl{padding-top:0}
+  .res-h,.res-b{padding-left:1.1rem;padding-right:1.1rem}
+}
+
+/* ---- levels diagram ---- */
+.levels{display:flex;flex-wrap:wrap;gap:.5rem;align-items:stretch;margin:1.25rem 0}
+.lv{flex:1 1 11rem;background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:.9rem 1rem}
+.lv .eyebrow{display:block;margin-bottom:.3rem}
+.lv b{font-family:var(--sans);font-size:.98rem;display:block;margin-bottom:.2rem}
+.lv span{font-size:.88rem;color:var(--ink-2);line-height:1.5}
+.arrow{align-self:center;color:var(--ink-3);font-family:var(--sans);font-weight:700}
+@media (max-width:640px){.arrow{display:none}}
+
+footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--rule);font-size:.85rem;color:var(--ink-3);font-family:var(--sans)}
+footer a{color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="wrap">
+<header class="top"><div class="eyebrow">Programación Extrema y Desarrollo Guiado por Pruebas · Unidad&nbsp;1</div><h1>Cuatro fuentes y un guión</h1><p class="lede">Curaduría de contenidos en español y guión de exposición — Unidad 1, Fundamentos de Programación Extrema.</p><div class="facts">
+<div class="fact"><span class="eyebrow">Duración</span><b>Semanas 1–2</b></div>
+<div class="fact"><span class="eyebrow">Carga</span><b>8 h</b></div>
+<div class="fact"><span class="eyebrow">Clases</span><b>Clases 1 y 2</b></div>
+<div class="fact"><span class="eyebrow">Evaluación</span><b>análisis de caso + mapa valor–principio–práctica</b></div>
+</div></header>
+<section><div class="shead"><div class="eyebrow">Por qué estas cuatro</div><h2>Criterio</h2></div>
+<p>La unidad cubre cuatro cosas: qué se valora en agilidad, qué principios se derivan, qué es XP, dónde se ubica XP. Ninguna fuente hace las cuatro.</p>
+<ul class="tight"><li><b>Manifiesto y Principios</b> — fuente primaria, traducción oficial, firmada por Kent Beck: el puente hacia XP.</li><li><b>Lean Mind</b> — única síntesis completa y en español de <i>Extreme Programming Explained</i>.</li><li><b>Guía Práctica</b> — lo que las otras no tienen: ciclos de vida y nomenclador español de las prácticas.</li></ul>
+<div class="scroll"><table><thead><tr><th>Qué necesita la unidad</th><th>Manifiesto</th><th>Principios</th><th>Lean Mind</th><th>Guía Práctica</th></tr></thead><tbody><tr><td>Qué se valora en agilidad</td><td class="yes">Sí</td><td class="no">Parcial</td><td class="no">No</td><td class="yes">Sí</td></tr><tr><td>Los doce principios ágiles</td><td class="no">No</td><td class="yes">Sí</td><td class="no">No</td><td class="yes">Sí</td></tr><tr><td>Valores de XP</td><td class="no">No</td><td class="no">No</td><td class="yes">Sí</td><td>Sólo listados</td></tr><tr><td>Principios de XP</td><td class="no">No</td><td class="no">No</td><td class="yes">Sí</td><td>Sólo listados</td></tr><tr><td>Prácticas de XP</td><td class="no">No</td><td class="no">No</td><td class="yes">Sí</td><td class="yes">Sí · en español</td></tr><tr><td>Dónde se ubica XP</td><td class="no">No</td><td class="no">No</td><td class="no">Parcial</td><td class="yes">Sí</td></tr><tr><td>Predictivo vs. adaptativo</td><td class="no">Implícito</td><td class="no">Implícito</td><td class="no">No</td><td class="yes">Sí</td></tr></tbody></table></div>
+</section>
+<section><div class="shead"><div class="eyebrow">Curaduría</div><h2>Las cuatro fuentes</h2></div>
+<article class="res alumno"><div class="res-h"><div><h3>1. Manifiesto por el Desarrollo Ágil de Software</h3><span class="src">Agile Manifesto · traducción oficial de Ángel Medinilla, Andrés Giné y Esther Gómez · 2001</span></div><span class="chip oblig">Estudiante · obligatoria</span></div><div class="res-b"><p class="url"><a href="https://agilemanifesto.org/iso/es/manifesto.html">https://agilemanifesto.org/iso/es/manifesto.html</a> · 3 min</p>
+<h4>Qué dice</h4>
+<blockquote><p>Estamos descubriendo formas mejores de desarrollar software tanto por nuestra propia experiencia como ayudando a terceros. A través de este trabajo hemos aprendido a valorar:<br><b>Individuos e interacciones</b> sobre procesos y herramientas<br><b>Software funcionando</b> sobre documentación extensiva<br><b>Colaboración con el cliente</b> sobre negociación contractual<br><b>Respuesta ante el cambio</b> sobre seguir un plan<br>Esto es, aunque valoramos los elementos de la derecha, valoramos más los de la izquierda.</p></blockquote>
+<p>Firman diecisiete personas: Kent Beck (autor de XP), Ward Cunningham (deuda técnica), Ron Jeffries y Martin Fowler. XP no es una lectura posterior del Manifiesto: estaba en la sala.</p>
+<h4>Uso didáctico</h4>
+<p>Lectura dialogada. Toda la carga está en la última oración: el Manifiesto no niega los elementos de la derecha, los <b>ordena</b>. Sin ella se leen como cuatro rechazos —el malentendido a desactivar.</p>
+<p>La traducción oficial usa «sobre», que admite leerse como «en lugar de». PMI resuelve la misma línea como «más que»: menos elegante, más exacta. Ambas al pizarrón.</p>
+<h4>Consigna · individual, 10 min</h4>
+<ol class="tight"><li>Reescribir los cuatro pares con «más que», y luego con «en lugar de».</li><li>Elegir el par donde el cambio más altera el sentido y explicarlo en dos oraciones.</li><li>Nombrar una situación donde el elemento de la <i>derecha</i> deba ganar.</li></ol>
+<p>El punto 3 separa comprensión de repetición. Si nadie encuentra un caso —contrato de obra pública, auditoría regulatoria, integración con un tercero— la lectura fue superficial.</p>
+<div class="note warn"><span class="mark">Advertencia</span><p>No define agilidad, no explica prácticas, no menciona XP. Cuarenta palabras que sostienen la unidad y se agotan en un minuto si no se interrogan.</p></div>
+</div></article>
+<article class="res alumno"><div class="res-h"><div><h3>2. Principios del Manifiesto Ágil</h3><span class="src">Agile Manifesto · traducción oficial · doce principios</span></div><span class="chip oblig">Estudiante · obligatoria</span></div><div class="res-b"><p class="url"><a href="https://agilemanifesto.org/iso/es/principles.html">https://agilemanifesto.org/iso/es/principles.html</a> · 5 min</p>
+<p><b>Qué dice</b> — Doce principios, introducidos por «Seguimos estos principios». Sin numerar ni agrupar en el original; la agrupación es decisión de cátedra.</p>
+<div class="scroll"><table><thead><tr><th class="n">#</th><th>Principio (texto oficial, abreviado)</th><th>Grupo</th></tr></thead><tbody><tr><td class="n">1</td><td>Satisfacer al cliente mediante la entrega temprana y continua de software con valor.</td><td>A · Valor y entrega</td></tr><tr><td class="n">2</td><td>Aceptamos que los requisitos cambien, incluso en etapas tardías.</td><td>B · Cambio y simplicidad</td></tr><tr><td class="n">3</td><td>Entregamos software funcional frecuentemente, entre dos semanas y dos meses.</td><td>A · Valor y entrega</td></tr><tr><td class="n">4</td><td>Responsables de negocio y desarrolladores trabajamos juntos de forma cotidiana.</td><td>C · Personas</td></tr><tr><td class="n">5</td><td>Individuos motivados: darles entorno, apoyo y confianza.</td><td>C · Personas</td></tr><tr><td class="n">6</td><td>La conversación cara a cara es el método más eficiente de comunicar.</td><td>C · Personas</td></tr><tr><td class="n">7</td><td>El software funcionando es la medida principal de progreso.</td><td>A · Valor y entrega</td></tr><tr><td class="n">8</td><td>Desarrollo sostenible: ritmo constante de forma indefinida.</td><td>D · Sostenibilidad</td></tr><tr><td class="n">9</td><td>La atención continua a la excelencia técnica y al buen diseño mejora la Agilidad.</td><td>B · Cambio y simplicidad</td></tr><tr><td class="n">10</td><td>La simplicidad, o el arte de maximizar la cantidad de trabajo no realizado, es esencial.</td><td>B · Cambio y simplicidad</td></tr><tr><td class="n">11</td><td>Las mejores arquitecturas, requisitos y diseños emergen de equipos auto-organizados.</td><td>C · Personas</td></tr><tr><td class="n">12</td><td>A intervalos regulares el equipo reflexiona sobre cómo ser más efectivo y ajusta.</td><td>D · Sostenibilidad</td></tr></tbody></table></div>
+<h4>Uso didáctico</h4>
+<p>Asignar un grupo por equipo y pedir evidencias concretas en un equipo XP. La palabra que trabaja es «evidencia»: no se acepta «se comunican mejor», sí «el registro de rotación muestra que los cuatro tocaron el módulo de pagos esta semana». El principio afirma; la práctica lo vuelve observable; la evidencia se mira.</p>
+<p>La matriz completa está en Puente entre las fuentes. No repartirla antes: es la respuesta.</p>
+<h4>Consigna · equipos de 3–4, 25 min</h4>
+<ol class="tight"><li>Por cada principio del grupo, una práctica de XP que lo haga observable.</li><li>Por cada par, una <b>evidencia verificable</b>: artefacto, registro, métrica o conducta que un tercero constate sin preguntar.</li><li>El principio más difícil de evidenciar, y por qué.</li></ol>
+<p>El punto 3 suele caer en el 5 y el 11 —motivación y auto-organización—: los que ninguna herramienta certifica.</p>
+<div class="note warn"><span class="mark">Advertencia</span><p>El principio 6 supone colocación física. Con equipos distribuidos la pregunta no es si «sigue vigente», sino qué propiedad conservar —ancho de banda, sincronía, señales no verbales— y con qué medio.</p></div>
+</div></article>
+<article class="res alumno"><div class="res-h"><div><h3>3. Extreme Programming: valores, principios y prácticas</h3><span class="src">Lean Mind · 28/04/2023 · síntesis de Extreme Programming Explained, de Kent Beck</span></div><span class="chip guiada">Estudiante · guiada</span></div><div class="res-b"><p class="url"><a href="https://leanmind.es/es/blog/extreme-programming-valores-principios-practicas">https://leanmind.es/es/blog/extreme-programming-valores-principios-practicas</a> · 20 min</p>
+<h4>Qué dice</h4>
+<p>Desarma la caricatura del programador encerrado escribiendo a velocidad extrema, y planta la tesis de Beck:</p>
+<blockquote><p>XP es mi intento de reconciliar humanidad y productividad en mi práctica de desarrollo de software, y compartir esa reconciliación.</p><cite>Kent Beck</cite></blockquote>
+<p>Sigue la anécdota de Beck aprendiendo a conducir: su madre le suelta el volante, el auto se va al arcén, ella corrige y le dice que conducir no es llevar el auto en la dirección correcta, sino <b>prestar atención constantemente, haciendo una pequeña corrección aquí y otra allá</b>. Estar atento, adaptarse, cambiar. La mejor metáfora del feedback corto: contarla tal cual.</p>
+<p><b>Cinco valores</b> — comunicación, simplicidad, feedback, coraje, respeto. Dos énfasis: la mayoría de los problemas vienen de falta de comunicación y no de conocimiento técnico; el <b>respeto es el más importante</b> —sin él XP no funciona.</p>
+<p><b>Catorce principios</b> — humanidad, economía, beneficio mutuo, auto-similitud, mejora, diversidad, reflexión, flujo, oportunidad, redundancia, fracaso, calidad, pasos pequeños, responsabilidad aceptada. Existen para «reducir el nivel de abstracción y hacer de puente entre valores y prácticas». Tres merecen tiempo de clase:</p>
+<ul class="tight"><li><b>Calidad</b> — «Los proyectos no avanzan más rápido aceptando una calidad menor y no van más lento por tener mayor calidad.» Engancha con la Consigna 2 de la Clase 1.</li><li><b>Pasos pequeños</b> — mejor cinco pasos de coste 5 que uno de coste 20: el riesgo de llegar al punto equivocado es demasiado grande. Es el argumento de diseño detrás de TDD, tres unidades antes.</li><li><b>Responsabilidad aceptada</b> — «no puede ser asignada, sólo aceptada». Con ella viene la autoridad.</li></ul>
+<p><b>Trece prácticas primarias y diez corolarias.</b> Las corolarias sólo tras afianzar las primarias: sin un ratio de errores cercano a cero, el despliegue diario es peligroso. Al pizarrón:</p>
+<blockquote><p>Si las prácticas no están respaldadas por valores, estas se pudren.</p></blockquote>
+<h4>Uso didáctico</h4>
+<p>Único panorama a la vez específico de XP y enteramente en español. Lectura guiada, no libre: quien lo lee sin consigna se queda con la lista de prácticas, la parte menos importante.</p>
+<p>La guía fuerza los dos sentidos: dado un valor, qué práctica lo encarna; dada una práctica, qué valor la sostiene y qué se rompe sin él. El artículo modela el segundo —«practicamos pair programming porque valoramos la comunicación y el feedback rápido»— y sirve de muestra.</p>
+<h4>Consigna · lectura guiada, en pareja</h4>
+<ol class="tight"><li>Tres filas de <i>valor → principio → práctica → qué se rompe sin el valor</i>, con prácticas de secciones distintas.</li><li>El artículo afirma que el respeto es el valor más importante y el beneficio mutuo el principio más importante. Argumentar a favor o en contra de una, con un caso.</li><li>Una práctica que el equipo ya use sin llamarla por su nombre.</li></ol>
+<div class="note warn"><span class="mark">Advertencia</span><p>Conserva los títulos en inglés (<i>Sit Together</i>, <i>Slack</i>, <i>Ten-Minute Build</i>): resolverlo con el nomenclador antes de asignarlo. Es además una síntesis personal declarada —«quedan muchos conceptos en el libro que no he podido explicar aquí»—: el estudiante cita el artículo, no a Beck.</p></div>
+</div></article>
+<article class="res docente"><div class="res-h"><div><h3>4. Guía Práctica de Ágil</h3><span class="src">PMI y Agile Alliance · 2017 · ISBN 978-1-62825-414-3 · edición en español</span></div><span class="chip doc">Docente · ampliación</span></div><div class="res-b"><p class="url">archivo de cátedra AgilePG_SPA.pdf · 182 pp. · cuatro pasajes</p>
+<p><b>§2.1, p. 7 — Trabajo definible vs. alta incertidumbre.</b> Encuadra el problema antes de nombrar la solución.</p>
+<blockquote><p>Los proyectos de alta incertidumbre exhiben altas tasas de cambio, complejidad y riesgo. Estas características pueden presentar problemas para los enfoques predictivos tradicionales que apuntan a determinar la mayor parte de los requisitos al inicio, y a controlar los cambios a través de un proceso de solicitud de cambio. En cambio, los enfoques ágiles fueron creados para explorar la viabilidad en ciclos cortos, y adaptarse rápidamente en función de la evaluación y la retroalimentación.</p></blockquote>
+<p><b>§2.2, Gráfico 2-3, p. 10.</b> Respalda el tercer movimiento del guión:</p>
+<blockquote><p>Ágil es una mentalidad definida por valores, guiada por principios y que se manifiesta a través de muchas prácticas diferentes. Los profesionales practicantes de ágil seleccionan prácticas basadas en sus necesidades.</p></blockquote>
+<p><b>Gráfico 2-4, p. 11.</b> Lean como conjunto mayor; ágil y Kanban adentro; XP junto a Scrum, Crystal, FDD, DSDM y AUP. Responde «¿dónde entra XP?».</p>
+<p><b>§3.1, Tabla 3-1, pp. 18–19.</b> Material del contraste predictivo/adaptativo de la Clase 1.</p>
+<div class="scroll"><table><thead><tr><th>Enfoque</th><th>Requisitos</th><th>Actividades</th><th>Entrega</th><th>Meta</th></tr></thead><tbody><tr><td><b>Predictivo</b></td><td>Fijos</td><td>Una vez para todo el proyecto</td><td>Entrega única</td><td>Gestionar costos</td></tr><tr><td><b>Iterativo</b></td><td>Dinámicos</td><td>Repetidas hasta que esté correcto</td><td>Entrega única</td><td>Corrección de la solución</td></tr><tr><td><b>Incremental</b></td><td>Dinámicos</td><td>Una vez por incremento</td><td>Entregas frecuentes más pequeñas</td><td>Velocidad</td></tr><tr><td><b>Ágil</b></td><td>Dinámicos</td><td>Repetidas hasta que esté correcto</td><td>Entregas pequeñas frecuentes</td><td>Valor para el cliente mediante entregas frecuentes y retroalimentación</td></tr></tbody></table></div>
+<p>Ningún ciclo de vida es perfecto para todos: cada proyecto cae en un continuo entre frecuencia de entrega y grado de cambio. Ese matiz evita caricaturizar la cascada.</p>
+<p><b>Recuadro p. 20.</b> Desarma la idea errónea que la unidad debe trabajar:</p>
+<blockquote><p>Un ingrediente clave a recordar acerca de los ciclos de vida es que cada uno de ellos comparte el elemento de planificación. Lo que diferencia a un ciclo de vida no es si se hace la planificación, sino cuánta planificación se hace y cuándo.</p></blockquote>
+<p><b>§A3.3 y Tabla A3-2, p. 102.</b> Define XP como «un método de desarrollo de software basado en ciclos frecuentes», nombre que viene de «destilar una determinada mejor práctica hasta su forma más pura y sencilla, y aplicarla continuamente a lo largo de todo el proyecto». La tabla clasifica las prácticas en cuatro áreas —organizacional, técnica, planificación, integración—, primarias y secundarias, en español.</p>
+<p><b>§5.2.7, p. 55.</b> Prácticas técnicas «muchas de las cuales provienen de la eXtreme Programming»: integración continua, prueba a todos los niveles, ATDD, TDD y BDD, spikes. Anuncia hacia dónde va la materia.</p>
+<p><b>Uso didáctico</b> — Consulta docente. Al aula llegan dos materiales: la tabla de ciclos de vida proyectada y el nomenclador.</p>
+<div class="note warn"><span class="mark">Advertencia</span><p>Guía de dirección de proyectos, no de ingeniería: despacha TDD en tres líneas y nada dice de casos de prueba, dobles ni refactorización; las unidades 3–5 no se apoyan en ella. Su traducción del Manifiesto no es la oficial («más que» en vez de «sobre»): con estudiantes se usa agilemanifesto.org. El PDF no se sube al campus; se proyectan las tablas citándolas.</p></div>
+</div></article>
+</section>
+<section><div class="shead"><div class="eyebrow">Cruce</div><h2>Puente entre las fuentes</h2></div>
+<h3 class="sub">De principio ágil a evidencia observable</h3>
+<p>Ninguna fuente cruza los doce principios con las prácticas de XP. Ese cruce es el trabajo de la unidad; esta es la clave de corrección.</p>
+<div class="scroll"><table><thead><tr><th class="n">#</th><th>Principio ágil</th><th>Práctica de XP que lo hace observable</th><th>Evidencia verificable</th></tr></thead><tbody><tr><td class="n">1</td><td>Entrega temprana y continua de valor</td><td>Ciclo semanal · Despliegue incremental · Integración continua</td><td>Historial de releases fechado; un incremento accesible al cliente cada semana</td></tr><tr><td class="n">2</td><td>Aceptar cambios incluso tardíos</td><td>Diseño incremental · Refactorización · Prueba a priori</td><td>Un commit que cambia una regla de negocio con la suite verde, y un diff pequeño y localizado</td></tr><tr><td class="n">3</td><td>Entregas frecuentes de software funcional</td><td>Ciclo semanal · Construcción de 10 minutos</td><td>Duración medida del build en CI; días entre etiquetas de versión</td></tr><tr><td class="n">4</td><td>Negocio y desarrollo trabajan juntos a diario</td><td>Equipo completo · Participación real del cliente · Historias</td><td>Historias refinadas con el cliente presente; criterios acordados antes de implementar</td></tr><tr><td class="n">5</td><td>Individuos motivados, con entorno y confianza</td><td>Responsabilidad aceptada · Holgura · Continuidad del equipo</td><td>Tareas tomadas y no asignadas; holgura declarada en el compromiso; rotación baja</td></tr><tr><td class="n">6</td><td>Conversación cara a cara como medio principal</td><td>Sentarse juntos · Programación en pares · Espacio informativo</td><td>Registro de rotación de parejas; tablero que da el estado sin preguntar</td></tr><tr><td class="n">7</td><td>El software funcionando mide el progreso</td><td>Integración continua · Prueba a priori</td><td>Estado del pipeline como dato de avance; historias cumplidas, no porcentajes de tareas</td></tr><tr><td class="n">8</td><td>Ritmo constante sostenible</td><td>Ritmo constante · Holgura</td><td>Horas efectivas contra comprometidas; sin picos al cierre de iteración</td></tr><tr><td class="n">9</td><td>Excelencia técnica y buen diseño</td><td>Refactorización · Diseño incremental · Código compartido</td><td>Commits de refactor sin cambio de conducta, con suite verde antes y después</td></tr><tr><td class="n">10</td><td>Simplicidad: maximizar el trabajo no realizado</td><td>Diseño incremental · Historias pequeñas</td><td>Alcance recortado y registrado; sin código especulativo</td></tr><tr><td class="n">11</td><td>Equipos auto-organizados</td><td>Código compartido · Equipo completo</td><td>Cualquiera modifica cualquier módulo; revisiones cruzadas</td></tr><tr><td class="n">12</td><td>Reflexión periódica y ajuste</td><td>Ciclo semanal · Ciclo trimestral · Análisis de causa raíz</td><td>Acta con una acción medible y su responsable; causa raíz de un defecto registrada</td></tr></tbody></table></div>
+<p><b>Cómo corregir</b> — Se califica la última columna, no la tercera. Asociar principio y práctica es memoria; proponer una evidencia constatable exige haber entendido qué cambia en el trabajo. Se acepta otra práctica si la evidencia la sostiene.</p>
+<h3 class="sub">Nomenclador</h3>
+<p>Del inglés del artículo al español de la Guía Práctica (Tabla A3-2). Se reparte junto con la lectura de Lean Mind.</p>
+<div class="scroll"><table><thead><tr><th>Título en el artículo</th><th>Nombre en español</th><th>Área</th><th>Tipo</th></tr></thead><tbody><tr><td>Sit Together</td><td><b>Sentarse juntos</b></td><td>Organizacional</td><td>Primaria</td></tr><tr><td>Whole Team</td><td><b>Equipo completo</b></td><td>Organizacional</td><td>Primaria</td></tr><tr><td>Informative Workspace</td><td><b>Espacio de trabajo informativo</b></td><td>Organizacional</td><td>Primaria</td></tr><tr><td>Energized Work</td><td><b>Ritmo constante</b></td><td>Organizacional</td><td>Secundaria en PMI · primaria en el artículo</td></tr><tr><td>Pair Programming</td><td><b>Programación en pares</b></td><td>Técnica</td><td>Primaria</td></tr><tr><td>Test-First Programming</td><td><b>Programación de prueba a priori</b></td><td>Técnica · Integración</td><td>Primaria</td></tr><tr><td>Incremental Design</td><td><b>Diseño incremental</b></td><td>Técnica</td><td>Primaria</td></tr><tr><td>Stories</td><td><b>Historias de usuarios</b></td><td>Planificación</td><td>Primaria</td></tr><tr><td>Weekly Cycle</td><td><b>Ciclo semanal</b></td><td>Planificación</td><td>Primaria</td></tr><tr><td>Quarterly Cycle</td><td><b>Ciclo trimestral</b></td><td>Planificación</td><td>Primaria</td></tr><tr><td>Slack</td><td><b>Holgura</b></td><td>Planificación</td><td>Primaria</td></tr><tr><td>Ten-Minute Build</td><td><b>Construcción de 10 minutos</b></td><td>Integración</td><td>Primaria</td></tr><tr><td>Continuous Integration</td><td><b>Integración continua</b></td><td>Integración</td><td>Primaria</td></tr><tr><td>Real Customer Involvement</td><td><b>Participación real del cliente</b></td><td>Organizacional</td><td>Corolaria</td></tr><tr><td>Team Continuity</td><td><b>Continuidad del equipo</b></td><td>Organizacional</td><td>Corolaria</td></tr><tr><td>Shared Code</td><td><b>Código compartido / propiedad colectiva</b></td><td>Técnica</td><td>Corolaria</td></tr><tr><td>Code and Tests</td><td><b>Documentación a partir de código y pruebas</b></td><td>Técnica</td><td>Corolaria</td></tr><tr><td>Root-Cause Analysis</td><td><b>Análisis de causa raíz</b></td><td>Planificación</td><td>Corolaria</td></tr><tr><td>Shrinking Teams</td><td><b>Equipos en disminución</b></td><td>Planificación</td><td>Corolaria</td></tr><tr><td>Negotiated Scope Contract</td><td><b>Alcance del contrato negociado</b></td><td>Planificación</td><td>Corolaria</td></tr><tr><td>Incremental Deployment</td><td><b>Despliegue incremental</b></td><td>Integración</td><td>Corolaria</td></tr><tr><td>Single Code Base</td><td><b>Base de código única</b></td><td>Integración</td><td>Corolaria</td></tr><tr><td>Daily Deployment</td><td><b>Despliegue diario</b></td><td>Integración</td><td>Corolaria</td></tr></tbody></table></div>
+<p><b>Tres discrepancias a anticipar.</b> La Guía Práctica suma <i>Refactorización</i>, <i>Pago por uso</i> y <i>Reuniones diarias de pie</i>, que el artículo no lista aparte. Ubica <i>Ritmo constante</i> entre las secundarias, donde el artículo lo trata como primario. Y clasifica la prueba a priori en dos áreas. Son dos recortes de la misma familia: decirlo enseña más que ocultarlo.</p>
+</section>
+<section><div class="shead"><div class="eyebrow">Clase 1 · exposición · 45 min</div><h2>Guión desarrollado</h2></div>
+<p><b>Clase 1 · exposición · 45 minutos.</b> Cinco movimientos sobre los cinco puntos del guión sugerido. Minutos acumulativos dentro del bloque.</p>
+<div class="mv"><div class="tl">00–08</div><div class="mv-b"><h3>El proyecto que no anda</h3>
+<p>No se abre con una definición sino con Mercatienda, ya diagnosticado en los primeros veinticinco minutos: se leen los seis síntomas como el parte de un equipo real.</p>
+<p><b>Idea a instalar:</b> ninguno de los seis es un problema de talento. Son problemas de <b>sistema de trabajo</b>: cuándo se entera el equipo de que algo está mal, y cuánto cuesta corregirlo entonces.</p>
+<p><b>Pizarrón:</b> los seis síntomas en columna, con una columna vacía a la derecha para el movimiento 3.</p>
+<p><b>Cierre:</b> «¿Cuál de estos seis empeora si el equipo trabaja más horas?». La respuesta —todos— es el primer argumento de la clase.</p>
+</div></div>
+<div class="mv"><div class="tl">08–16</div><div class="mv-b"><h3>Construir la definición desde el problema, y ubicar XP</h3>
+<p>Recién ahora se nombra la agilidad, y como respuesta. §2.1: hay trabajo definible, con procedimientos que ya funcionaron, y trabajo de alta incertidumbre, que exige explorar en ciclos cortos y adaptarse según la retroalimentación. El software de producto vive en el segundo.</p>
+<p>Lectura dialogada del <b>Manifiesto</b>, deteniéndose en la última oración. Los falsos dilemas se abren acá y se retoman en el movimiento 4.</p>
+<p>Se ubica XP con el Gráfico 2-4 y se da la definición corta:</p>
+<blockquote><p>eXtreme Programming es un método de desarrollo de software basado en ciclos frecuentes. El nombre se basa en la filosofía de destilar una determinada mejor práctica hasta su forma más pura y sencilla, y aplicarla continuamente a lo largo de todo el proyecto.</p><cite>Guía Práctica, §A3.3</cite></blockquote>
+<p><b>No saltear:</b> Kent Beck firma el Manifiesto. XP no deriva de él ni lo precede; son contemporáneos, y XP es la parte de esa conversación que se ocupó de las prácticas técnicas.</p>
+<p><b>Cierre:</b> «Si el nombre viene de llevar una buena práctica a su forma más pura y aplicarla siempre, ¿qué práctica que ya usan a veces valdría la pena llevar al extremo?».</p>
+</div></div>
+<div class="mv"><div class="tl">16–28</div><div class="mv-b"><h3>Tres niveles conectados</h3>
+<p>Movimiento central, sostenido por el Gráfico 2-3: ágil es una mentalidad <b>definida</b> por valores, <b>guiada</b> por principios y <b>manifestada</b> en prácticas.</p>
+<div class="scroll"><table><thead><tr><th>Nivel</th><th>Función</th><th>Contenido</th></tr></thead><tbody><tr><td><b>1 · Valores</b></td><td>Orientan</td><td>Comunicación, simplicidad, feedback, coraje, respeto. No se observan directamente.</td></tr><tr><td><b>2 · Principios</b></td><td>Traducen</td><td>Bajan la abstracción y hacen de puente. Calidad, pasos pequeños, beneficio mutuo, redundancia.</td></tr><tr><td><b>3 · Prácticas</b></td><td>Vuelven observable</td><td>Pares, prueba a priori, integración continua, ciclo semanal.</td></tr></tbody></table></div>
+<p>El nivel intermedio es el que se saltea siempre y el que hace falta. Ejemplo del artículo: documento o conversación, ¿qué comunica mejor? Depende del contexto y de los principios; el de <b>humanidad</b> señala que la conversación satisface además la necesidad de conexión, y por eso XP la prefiere. Sin el principio, la elección parece arbitraria.</p>
+<p>Dos cadenas completas, en ambos sentidos:</p>
+<ul class="tight"><li><b>Feedback → pasos pequeños → prueba a priori.</b> Si el ciclo de corrección es largo, el error se descubre tarde. Cinco pasos de coste 5 antes que uno de coste 20.</li><li><b>Pares → redundancia → comunicación y coraje.</b> Duplicar el coste por tarea sólo tiene sentido si el desastre que evita cuesta más. Y sin respeto, la pareja es vigilancia.</li></ul>
+<p>Se vuelve al pizarrón y se completa la columna vacía: por cada síntoma, qué práctica lo ataca y qué valor la sostiene.</p>
+<p><b>Cierre:</b> «¿Qué pasa con una práctica cuando el equipo olvida por qué la hace?». Se pudre.</p>
+</div></div>
+<div class="mv"><div class="tl">28–38</div><div class="mv-b"><h3>Ejemplos y contraejemplos</h3>
+<p>Los contraejemplos delimitan mejor que los ejemplos.</p>
+<div class="scroll"><table><thead><tr><th>Situación</th><th>¿Es XP?</th><th>Qué falta</th></tr></thead><tbody><tr><td>Despliega tres veces por día, sin pruebas automatizadas, revisando a mano</td><td class="no">No</td><td>Rapidez sin feedback. La velocidad no da información: el equipo se entera tarde y con usuarios adentro.</td></tr><tr><td>4.000 pruebas, 90 % de cobertura, cada persona dueña de su módulo</td><td class="no">No</td><td>Pruebas sin colaboración. Sin código compartido no hay propiedad colectiva.</td></tr><tr><td>Iteraciones semanales y demo cada viernes, sin refactorizar nunca</td><td class="no">No</td><td>Ritmo sin calidad interna. El coste del cambio vuelve a crecer y la iteración semanal se hace incumplible.</td></tr><tr><td>Pares obligatorios ocho horas por día, sin holgura y con horas extra</td><td class="no">No</td><td>Práctica sin principio. Se aplica la forma y se violan ritmo constante y humanidad: el par se vuelve agotamiento compartido.</td></tr><tr><td>Ciclo semanal, criterios acordados con el cliente, pares rotando, build de ocho minutos, refactor bajo suite verde</td><td class="yes"><b>Sí</b></td><td>Los tres niveles presentes: prácticas, principios que las explican, valores que las sostienen.</td></tr></tbody></table></div>
+<p><b>Cierre:</b> «Los cuatro primeros tienen prácticas de XP. ¿Por qué ninguno es XP?». Porque XP es un sistema, y las prácticas aisladas no se sostienen entre sí.</p>
+</div></div>
+<div class="mv"><div class="tl">38–45</div><div class="mv-b"><h3>El criterio de coherencia</h3>
+<p>Se cierra con la regla que rige el resto de la materia: <b>una práctica se evalúa por el aprendizaje y la calidad que produce en el sistema de trabajo</b>, no por su cumplimiento. De ahí, tres preguntas aplicables a cualquier práctica:</p>
+<ol class="tight"><li>¿Qué información nueva le da al equipo, y en cuánto tiempo?</li><li>¿Qué pasa con el coste del próximo cambio después de aplicarla?</li><li>¿Qué valor la sostiene, y qué se rompe si ese valor falta?</li></ol>
+<p>Se anticipa el recorrido: la Unidad 2 toma las prácticas de colaboración y planificación; las unidades 3–5 convierten la prueba a priori en el ciclo de TDD. La lista de §5.2.7 muestra que la materia entera cabe en la última fila de la Tabla A3-2.</p>
+<p><b>Pase al taller:</b> se entrega el ticket de salida y se pasa al bloque de análisis en equipos.</p>
+</div></div>
+</section>
+<section><div class="shead"><div class="eyebrow">Material de apoyo</div><h2>El caso de apertura: Mercatienda</h2></div>
+<p>Se entrega impreso al comenzar, sin más contexto que este. <b>Mercatienda</b> es un comercio electrónico de indumentaria: cinco personas, nueve meses de desarrollo, presión por lanzar antes de la temporada. Seis síntomas reportados.</p>
+<div class="scroll"><table><thead><tr><th class="n">#</th><th>Síntoma</th><th>Principio comprometido</th><th>Práctica que lo ataca</th></tr></thead><tbody><tr><td class="n">1</td><td>En la segunda semana el cliente pide cambiar la pasarela de pagos por otra con menores comisiones, justo cuando se estaban por terminar las pruebas finales.</td><td>2 · Aceptar el cambio</td><td>Diseño incremental, prueba a priori, refactorización</td></tr><tr><td class="n">2</td><td>Los defectos aparecen en la semana de pruebas previa al lanzamiento. En el último hito fueron treinta y uno.</td><td>7 · Software funcionando como medida</td><td>Prueba a priori, integración continua, build de 10 minutos</td></tr><tr><td class="n">3</td><td>Una sola persona entiende el módulo de stock. Está de licencia dos semanas y nadie toca ese código.</td><td>11 · Equipos auto-organizados</td><td>Código compartido, pares, equipo completo</td></tr><tr><td class="n">4</td><td>La última salida a producción fue hace once semanas. Hay cuarenta días de trabajo «terminado» sin desplegar.</td><td>1 y 3 · Entrega temprana y frecuente</td><td>Ciclo semanal, despliegue incremental y diario</td></tr><tr><td class="n">5</td><td>Integrar la rama de checkout lleva dos días y rompe funcionalidades ya probadas.</td><td>9 · Excelencia técnica</td><td>Integración continua, base de código única, prueba a priori</td></tr><tr><td class="n">6</td><td>Las dos últimas semanas de cada hito se trabajan once horas por día. Dos personas renunciaron este año.</td><td>8 · Ritmo sostenible</td><td>Ritmo constante, holgura, continuidad del equipo</td></tr></tbody></table></div>
+<p><b>Uso</b> — Las dos últimas columnas no se entregan: son la clave de corrección del bloque de análisis. El caso alimenta también la Consigna 3 de la Clase 1, «El dilema del cliente», que es el síntoma 1 desarrollado.</p>
+<p><b>Variante para el taller</b> — La propuesta mínima de dos semanas se construye sobre este caso: qué entregar primero, cómo validarlo, qué aprender antes de comprometer el resto. La restricción que lo hace interesante: la primera entrega debe ser funcional para un usuario real, no una capa técnica completa.</p>
+</section>
+<section><div class="shead"><div class="eyebrow">Ideas erróneas</div><h2>Falsos dilemas y cómo desarmarlos</h2></div>
+<div class="scroll"><table><thead><tr><th>Lo que se escucha</th><th>Respuesta</th><th>Fuente</th></tr></thead><tbody><tr><td>«Ágil es no planificar»</td><td>Todos los ciclos de vida planifican. Cambia cuánta planificación y cuándo, no si la hay. Cuatro prácticas primarias de XP son de planificación.</td><td>Guía Práctica, p. 20 y Tabla A3-2</td></tr><tr><td>«Ágil es no documentar»</td><td>El Manifiesto valora software funcionando <i>sobre</i> documentación extensiva, y aclara que también valora lo de la derecha. <i>Code and Tests</i> no elimina la documentación: la mueve a donde no se desactualiza.</td><td>Manifiesto · Lean Mind</td></tr><tr><td>«Ágil es no diseñar»</td><td>El diseño incremental es práctica primaria, no omisión. Se empieza con un diseño mínimo y se evoluciona según aparecen necesidades.</td><td>Lean Mind · Principio 9</td></tr><tr><td>«Ágil es no tener procesos ni herramientas»</td><td>El primer par dice <i>sobre</i>, no <i>sin</i>. XP prescribe integración continua, build de diez minutos y batería de pruebas: es más exigente que lo que reemplaza.</td><td>Manifiesto · Tabla A3-2</td></tr><tr><td>«Bajar la calidad para llegar a la fecha»</td><td>Los proyectos no avanzan más rápido con menor calidad ni más lento con mayor. Y la calidad no es sólo económica: las personas necesitan un trabajo del que sentirse orgullosas.</td><td>Lean Mind, <i>Quality</i></td></tr><tr><td>«XP es Scrum con otro nombre»</td><td>Scrum define roles, eventos y artefactos de gestión; XP define además prácticas de ingeniería que Scrum no prescribe. Se combinan con frecuencia.</td><td>Guía Práctica, Gráfico 2-4 y §A3.3</td></tr><tr><td>«Sirve para startups, no para proyectos serios»</td><td>El criterio es el grado de incertidumbre y la frecuencia de entrega, no el tamaño de la empresa. Requisitos fijos y bajo riesgo se sirven mejor de un ciclo predictivo. La discusión honesta es dónde cae el proyecto en el continuo.</td><td>Guía Práctica, Tabla 3-1 y Gráfico 3-1</td></tr></tbody></table></div>
+</section>
+<section><div class="shead"><div class="eyebrow">Evaluación</div><h2>Evidencias de la unidad</h2></div>
+<div class="scroll"><table><thead><tr><th>Momento</th><th>Evidencia</th><th>Qué se mira</th></tr></thead><tbody><tr><td>Clase 1 · inicio</td><td>Diagnóstico individual sobre Mercatienda: dos riesgos y una respuesta</td><td>Línea de base sin calificación. Sirve para armar parejas y ver quién trae vocabulario ágil.</td></tr><tr><td>Clase 1 · análisis</td><td>Matriz síntoma – principio</td><td>Que el vínculo esté justificado, no adivinado. Se acepta más de un principio por síntoma si se argumenta.</td></tr><tr><td>Clase 1 · taller</td><td>Borrador de iteración de dos semanas</td><td>Que la primera entrega sea funcional para un usuario, y que estén dichos cómo se valida y qué se aprende primero.</td></tr><tr><td>Clase 1 · cierre</td><td>Ticket de salida</td><td>La segunda mitad de la frase. Sin un límite nombrado, XP se entendió como consigna y no como sistema.</td></tr><tr><td>Clase 2</td><td>Informe de análisis de caso</td><td>Uso correcto de los tres niveles, evidencias observables y al menos un contraejemplo propio.</td></tr><tr><td>Unidad 1</td><td>Mapa valor – principio – práctica</td><td>Cadenas completas. Se penaliza el mapa que salta el nivel de principios.</td></tr></tbody></table></div>
+<p><b>Ticket de salida</b> — cinco minutos, sin apuntes, con nombre: «XP sería útil en Mercatienda porque…» / «XP no resolvería por sí sola…»</p>
+</section>
+<section><div class="shead"><div class="eyebrow">Fuentes citadas</div><h2>Referencias</h2></div>
+<ul class="tight"><li>Beck, K. <i>et al.</i> (2001). <b>Manifiesto por el Desarrollo Ágil de Software.</b> Trad. Ángel Medinilla, Andrés Giné y Esther Gómez. <a href="https://agilemanifesto.org/iso/es/manifesto.html">https://agilemanifesto.org/iso/es/manifesto.html</a></li><li>Beck, K. <i>et al.</i> (2001). <b>Principios del Manifiesto Ágil.</b> <a href="https://agilemanifesto.org/iso/es/principles.html">https://agilemanifesto.org/iso/es/principles.html</a></li><li>Lean Mind (28/04/2023). <b>Valores, Principios y Prácticas. Extreme Programming Explained.</b> <a href="https://leanmind.es/es/blog/extreme-programming-valores-principios-practicas">https://leanmind.es/es/blog/extreme-programming-valores-principios-practicas</a></li><li>PMI y Agile Alliance (2017). <b>Guía Práctica de Ágil.</b> ISBN 978-1-62825-414-3. Pasajes citados: §2.1 (p. 7), §2.2 y Gráficos 2-3 y 2-4 (pp. 8–11), §3.1, Tabla 3-1 y Gráfico 3-1 (pp. 18–20), §5.2.7 (p. 55), §A3.3 y Tabla A3-2 (p. 102).</li><li>Lectura de fondo, no asignada: Beck, K. y Andres, C. (2004). <i>Extreme Programming Explained: Embrace Change</i>, 2.ª ed. Addison-Wesley.</li></ul>
+</section>
+<footer>Los textos del Manifiesto se reproducen íntegros conforme a su nota de copyright. Los pasajes de la Guía Práctica de Ágil se citan con sección y página; el PDF no se redistribuye.</footer>
+</div>

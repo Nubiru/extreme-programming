@@ -1,0 +1,50 @@
+name: Verificación continua
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    name: Tipos, pruebas y aceptación
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend/unidad-1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 22.18 o superior: ejecuta TypeScript sin compilar.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+          cache-dependency-path: backend/unidad-1/package-lock.json
+
+      # `npm ci` instala exactamente lo que fija el lock: la instalación es
+      # reproducible y un lock desactualizado hace fallar el pipeline.
+      - name: Instalar con bloqueo
+        run: npm ci
+
+      - name: Verificar tipos
+        run: npm run check
+
+      - name: Pruebas unitarias y de contrato
+        run: npm test
+
+      - name: Escenarios de aceptación
+        run: npm run aceptacion
+
+      - name: Cobertura
+        run: npm run coverage
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: backend/unidad-1/coverage/
+          if-no-files-found: warn

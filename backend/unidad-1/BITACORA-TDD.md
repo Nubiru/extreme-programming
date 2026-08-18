@@ -1,0 +1,143 @@
+# Bitácora TDD — historia vertical de inscripciones
+
+Evidencia del proceso, no sólo del resultado. Reproducible con `npm run verificar`.
+
+**Historia.** Como coordinador de carrera quiero inscribir estudiantes en materias
+para controlar el cupo disponible y la condición de cada estudiante.
+
+**Corte vertical.** Regla de dominio → contrato HTTP → persistencia sustituible.
+Sin UI: la Unidad 1 es backend.
+
+## Secuencia seguida
+
+| # | Fase | Qué se hizo | Resultado observado |
+|---|------|-------------|---------------------|
+| 0 | Línea de base | `curl` a los seis casos del README anterior | Conducta heredada registrada |
+| 1 | Rojo | Pruebas de caracterización contra `crearAplicacion`, que todavía no existía | Rojo por construcción (ver nota) |
+| 2 | Verde | Extraer el manejador de `servidor.ts` a `http/aplicacion.ts` | 7 pruebas en verde, `curl` idéntico a la línea de base |
+| 3 | Rojo | Pruebas unitarias de `validarSolicitud`, `cuposDisponibles` e `inscribir` | Escritas antes del módulo de dominio |
+| 4 | Verde | Implementar el dominio puro | Reglas verdes sin tocar HTTP |
+| 5 | Rojo → verde | Pruebas de contrato de `POST /inscripciones` y del legajo | Se agrega el ruteo y la tabla motivo → código |
+| 6 | Aceptación | 10 escenarios Gherkin en español sobre el contrato HTTP | 10 escenarios en verde |
+| 7 | Mutación | Tres defectos sembrados, uno por vez | Un hueco real detectado |
+| 8 | Refactor | Escenario 11 para cerrar el hueco; dos pruebas para cerrar cobertura | 41 pruebas + 11 escenarios en verde |
+
+> **Nota honesta sobre el paso 1.** Las pruebas de caracterización se escribieron
+> antes que el módulo que importan, pero la ejecución en rojo no quedó capturada:
+> el entorno bloqueó ese primer intento y la primera corrida registrada ya estaba
+> en verde. Los rojos que sí se observaron en esta historia son los del paso 7.
+> La conducta previa al refactor quedó registrada por `curl`. En la historia de
+> `suma`, más abajo, el rojo sí está capturado en los dos niveles.
+
+## Segunda historia: `suma` (de afuera hacia adentro)
+
+La kata de `TDD-to-backend.md`, ahora con criterios de aceptación primero. Acá sí
+quedó capturado el rojo en los dos niveles, en este orden:
+
+| # | Fase | Acción | Salida observada |
+|---|------|--------|------------------|
+| 1 | Criterios | `features/suma.feature`: 6 escenarios con las reglas acordadas | — |
+| 2 | **Rojo (aceptación)** | `npm run aceptacion` sin el módulo de dominio | `ERR_MODULE_NOT_FOUND: src/dominio/suma.ts` |
+| 3 | **Rojo (unitario)** | `npm test` con `suma.test.ts` escrito antes del código | `FAIL · Cannot find module './suma.ts'` · 41 pasaron, 1 archivo falló |
+| 4 | Verde | Implementar `suma` con la guarda de tipo | 57 pruebas · 16 escenarios en verde |
+| 5 | Refactor | El mensaje de error se movió del fixture al dominio | La dependencia va de la prueba al código, no al revés |
+
+El paso 5 corrigió un olor: la constante `MENSAJE_ARGUMENTOS_INVALIDOS` vivía en
+`suma.fixture.ts` y el módulo de producción la importaba desde `pruebas/`. Ahora
+el dominio la define y el fixture la reexporta.
+
+**Mutación sobre `suma`.** Se anuló la validación (`if (false)` y suma con
+casteo), de modo que `"2" + 3` devuelve `"23"`:
+
+| | Unitarias | Aceptación |
+|---|---|---|
+| Sin validación de tipo | ✅ 8 pruebas fallan | ✅ 1 escenario falla |
+
+**Límite documentado, no resuelto.** `suma(Infinity, 1)` devuelve `Infinity`
+porque el criterio acordado sólo excluye `NaN`. Hay una prueba que fija esa
+conducta en un bloque llamado *"límites todavía sin acordar con el cliente"*:
+si mañana se decide rechazarlo, la prueba falla y obliga a la conversación.
+
+## Estado final
+
+```
+tsc --noEmit          sin errores
+vitest run            3 archivos · 57 pruebas en verde
+cucumber-js           16 escenarios · 68 pasos en verde
+cobertura             100 % líneas · 96,34 % ramas
+```
+
+## Prueba de mutación (Clase 8)
+
+Cada defecto se sembró por separado y se corrieron las dos suites.
+
+| Defecto sembrado | Unitarias | Contrato | Aceptación |
+|------------------|-----------|----------|------------|
+| 1 · Se omite la regla "estudiante activo" (`if (false && !estudiante.activo)`) | ✅ 1 falla | ✅ 2 fallan | ✅ 1 escenario falla |
+| 2 · El cupo cuenta inscripciones de **todas** las materias | ✅ 1 falla | ❌ no la detecta | ❌ no la detecta |
+| 3 · `POST` exitoso devuelve `200` en vez de `201` | ❌ no aplica | ✅ 1 falla | ✅ 4 escenarios fallan |
+
+**Lectura.** El defecto 2 revela un hueco real: ningún escenario inscribía en una
+materia y verificaba el cupo de **otra**. Se agregó el escenario *"El cupo de una
+materia no se ve afectado por inscripciones en otra"* y se reinyectó el defecto
+para comprobar que ahora sí falla (10 pasaron, 1 falló). Con el código restaurado,
+los 11 escenarios vuelven a verde.
+
+El defecto 3 muestra el efecto contrario: un cambio de una línea en la capa HTTP
+rompe cuatro escenarios de aceptación pero ninguna prueba de dominio. Cada nivel
+detecta lo suyo; la duplicación entre niveles no es simetría.
+
+## Cobertura leída como información
+
+```
+Statements 100 % (104/104)   Branches 96,05 % (73/76)
+Functions  100 % (20/20)     Lines    100 % (97/97)
+```
+
+Al leer el primer reporte (93,42 % de ramas) aparecieron tres huecos. Dos se
+cerraron con pruebas nuevas porque describían conducta observable:
+
+- subruta desconocida bajo un estudiante existente (`/estudiantes/1/notas` → `404`);
+- `POST /inscripciones` sin cuerpo → `400` por validación, no por JSON inválido.
+
+El tercero —`aplicacion.ts:45-46`, los `?? ""` sobre `solicitud.method` y
+`solicitud.url`— se deja sin cubrir a propósito: son defensas contra un estado
+que el módulo `node:http` no produce. Cubrirlas exigiría simular la solicitud y
+la prueba no verificaría ninguna conducta del sistema.
+
+## Trazabilidad requisito → prueba → código
+
+| Criterio de aceptación | Prueba unitaria | Prueba de contrato | Escenario |
+|------------------------|-----------------|--------------------|-----------|
+| Estudiante activo + cupo → inscripto | `acepta a un estudiante activo…` | `registra la inscripción… 201` | Un estudiante activo se inscribe |
+| La inscripción figura en el legajo | — | `devuelve sólo las inscripciones de ese estudiante` | La inscripción queda visible en el legajo |
+| El cupo se descuenta | `descuenta las inscripciones ya registradas` | `descuenta el cupo de la materia` | queda con 1 cupo disponible |
+| El cupo es por materia | `no cuenta las inscripciones de otras materias` | — | El cupo no se ve afectado por otra materia |
+| Estudiante inactivo → rechazo | `rechaza a un estudiante inactivo` | `responde 409…` | Un estudiante inactivo no puede inscribirse |
+| Sin inscripción duplicada | `rechaza una segunda inscripción` | `responde 409 ante una inscripción repetida` | No se admite inscribirse dos veces |
+| Sin cupo → rechazo | `rechaza cuando la materia agotó su cupo` | `responde 409 cuando la materia agotó el cupo` | Una materia sin cupo rechaza |
+| Estudiante o materia inexistente | `rechaza a un estudiante que no existe` / `…materia…` | dos pruebas `404` | dos escenarios `404` |
+| Contrato del cuerpo | seis pruebas de `validarSolicitud` | tres pruebas `400` | tres escenarios `400` |
+
+## Decisiones de diseño que empujaron las pruebas
+
+1. **Separar validar de decidir.** `validarSolicitud` responde "¿puedo
+   interpretar esto?" y `inscribir` responde "¿debo aceptarlo?". Sin esa
+   separación, cada prueba de regla tendría que armar un cuerpo JSON completo.
+2. **El dominio no devuelve códigos HTTP.** Devuelve un motivo. Cambiar `409`
+   por `422` es una línea en la capa HTTP y ninguna en las reglas.
+3. **Inyectar el reloj.** Permite afirmar `fecha` exacta sin congelar el tiempo
+   global ni volver frágil la prueba.
+4. **`inscribir` no muta el estado.** Decidir y registrar son pasos distintos;
+   hay una prueba que lo fija (`no modifica el estado recibido`).
+5. **Repositorio nuevo por aplicación.** Cada prueba y cada escenario parten de
+   datos limpios sin necesidad de un `reset` compartido.
+
+## Deuda registrada
+
+- Persistencia en memoria: se pierde al reiniciar.
+- Método no contemplado sobre ruta existente → `404` en lugar de `405`
+  (conducta heredada, conservada a propósito durante el refactor).
+- `/estudiantes/` con barra final cambió de mensaje: único cambio observable
+  introducido por el refactor.
+- Sin CI todavía: el próximo paso es un workflow que ejecute `npm run verificar`.
