@@ -22,3 +22,10 @@ Thumbs.db
 # Queda fuera del repo hasta confirmar que es privado. Para incluirlo:
 #   borrar la línea de abajo y ejecutar  git add -f AgilePG_SPA.pdf
 AgilePG_SPA.pdf
+
+# Salida de la demostración con analizador de paquetes: se regenera con
+#   backend/unidad-1/demo/captura-http.sh
+# La transcripción de una corrida real sí queda versionada en demo/sesion-ejemplo.txt
+backend/unidad-1/demo/salida/
+*.pcapng
+*.pcap

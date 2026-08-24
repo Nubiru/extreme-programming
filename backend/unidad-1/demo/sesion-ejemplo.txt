@@ -1,0 +1,310 @@
+Transcripción de una corrida real de demo/captura-http.sh --sin-captura
+Servidor: node src/servidor.ts · Node v22.21.1 · 21 solicitudes
+Se regenera con: ./demo/captura-http.sh
+================================================================================
+
+Servidor: node src/servidor.ts en http://127.0.0.1:3000
+
+===============================================================
+ Unidad 1 · sección 7 — casos de prueba de la consigna
+===============================================================
+
+───────────────────────────────────────────────────────────────
+▶ GET /salud — el endpoint de estado responde 200 y JSON
+$ curl -i http://127.0.0.1:3000/salud
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 50
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"estado":"ok","fecha":"2026-08-24T22:37:05.057Z"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /ruta-inexistente — una ruta desconocida responde 404, no 200
+$ curl -i http://127.0.0.1:3000/ruta-inexistente
+
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Content-Length: 33
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Recurso no encontrado"}
+
+===============================================================
+ Endpoints agregados en esta unidad
+===============================================================
+
+───────────────────────────────────────────────────────────────
+▶ GET /hora — segundo endpoint pedido por la consigna
+$ curl -i http://127.0.0.1:3000/hora
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 35
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"hora":"2026-08-24T22:37:05.089Z"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /estudiantes/42 — parámetro de ruta: identifica un recurso
+$ curl -i http://127.0.0.1:3000/estudiantes/42
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 47
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":42,"nombre":"Juan Gómez","activo":false}
+
+───────────────────────────────────────────────────────────────
+▶ GET /estudiantes/42?detalle=completo — la consulta no cambia el recurso
+$ curl -i http://127.0.0.1:3000/estudiantes/42?detalle=completo
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 47
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":42,"nombre":"Juan Gómez","activo":false}
+
+───────────────────────────────────────────────────────────────
+▶ GET /estudiantes/999 — 404: el recurso no existe
+$ curl -i http://127.0.0.1:3000/estudiantes/999
+
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Estudiante no encontrado"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /estudiantes/abc — 400: la solicitud está mal formada
+$ curl -i http://127.0.0.1:3000/estudiantes/abc
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Content-Length: 44
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"El id debe ser un número entero"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /materias — colección con el cupo calculado
+$ curl -i http://127.0.0.1:3000/materias
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 175
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[{"codigo":"algoritmos","nombre":"Algoritmos y Estructuras de Datos","cupo":2,"cuposDisponibles":2},{"codigo":"bases","nombre":"Bases de Datos","cupo":1,"cuposDisponibles":1}]
+
+===============================================================
+ Métodos: HEAD, OPTIONS y el método equivocado
+===============================================================
+
+───────────────────────────────────────────────────────────────
+▶ HEAD /salud — mismos encabezados que GET, sin cuerpo
+$ curl -I http://127.0.0.1:3000/salud
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 50
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+───────────────────────────────────────────────────────────────
+▶ HEAD /materias — anuncia Content-Length sin transferir el cuerpo
+$ curl -I http://127.0.0.1:3000/materias
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 175
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+───────────────────────────────────────────────────────────────
+▶ GET /materias (sólo encabezados) — el mismo Content-Length, ahora sí con cuerpo
+$ curl -i -o /dev/null -D - http://127.0.0.1:3000/materias
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 175
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+───────────────────────────────────────────────────────────────
+▶ HEAD /ruta-inexistente — 404 también sin cuerpo
+$ curl -I http://127.0.0.1:3000/ruta-inexistente
+
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Content-Length: 33
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+───────────────────────────────────────────────────────────────
+▶ OPTIONS /materias — 204 y el encabezado Allow
+$ curl -i -X OPTIONS http://127.0.0.1:3000/materias
+
+HTTP/1.1 204 No Content
+Allow: GET, HEAD, OPTIONS
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+───────────────────────────────────────────────────────────────
+▶ DELETE /materias — 405: la ruta existe, la operación no
+$ curl -i -X DELETE http://127.0.0.1:3000/materias
+
+HTTP/1.1 405 Method Not Allowed
+Content-Type: application/json; charset=utf-8
+Allow: GET, HEAD, OPTIONS
+Content-Length: 32
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Método no permitido"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /inscripciones — 405: esa ruta sólo admite POST
+$ curl -i http://127.0.0.1:3000/inscripciones
+
+HTTP/1.1 405 Method Not Allowed
+Content-Type: application/json; charset=utf-8
+Allow: POST, OPTIONS
+Content-Length: 32
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Método no permitido"}
+
+===============================================================
+ POST: creación, validación y conflicto
+===============================================================
+
+───────────────────────────────────────────────────────────────
+▶ POST /inscripciones — 201 Created y encabezado Location
+$ curl -i -X POST -H Content-Type: application/json -d {"estudianteId":1,"materia":"algoritmos"} http://127.0.0.1:3000/inscripciones
+
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /inscripciones/1
+Content-Length: 83
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:37:05.312Z"}
+
+───────────────────────────────────────────────────────────────
+▶ POST /inscripciones repetido — 409: entiendo la solicitud, el estado no la admite
+$ curl -i -X POST -H Content-Type: application/json -d {"estudianteId":1,"materia":"algoritmos"} http://127.0.0.1:3000/inscripciones
+
+HTTP/1.1 409 Conflict
+Content-Type: application/json; charset=utf-8
+Content-Length: 60
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"El estudiante ya está inscripto en esta materia"}
+
+───────────────────────────────────────────────────────────────
+▶ POST con JSON inválido — 400: no puedo interpretar la solicitud
+$ curl -i -X POST -H Content-Type: application/json -d { esto no es json http://127.0.0.1:3000/inscripciones
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Content-Length: 40
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"El cuerpo no es JSON válido"}
+
+───────────────────────────────────────────────────────────────
+▶ POST de un estudiante inactivo — 409 con el motivo en el cuerpo
+$ curl -i -X POST -H Content-Type: application/json -d {"estudianteId":42,"materia":"algoritmos"} http://127.0.0.1:3000/inscripciones
+
+HTTP/1.1 409 Conflict
+Content-Type: application/json; charset=utf-8
+Content-Length: 41
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"El estudiante no está activo"}
+
+───────────────────────────────────────────────────────────────
+▶ GET /estudiantes/1/inscripciones — el efecto del POST es observable
+$ curl -i http://127.0.0.1:3000/estudiantes/1/inscripciones
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 85
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:37:05.312Z"}]
+
+===============================================================
+ Una conexión TCP, varias solicitudes HTTP (keep-alive)
+===============================================================
+
+───────────────────────────────────────────────────────────────
+▶ Dos solicitudes reutilizando la misma conexión
+$ curl -i http://127.0.0.1:3000/salud http://127.0.0.1:3000/hora
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 50
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"estado":"ok","fecha":"2026-08-24T22:37:05.402Z"}HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 35
+Date: Mon, 24 Aug 2026 22:37:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"hora":"2026-08-24T22:37:05.402Z"}
+
+Transcripción: /home/gabiota/personal/study/tercero/prg. extrema/backend/unidad-1/demo/salida/sesion.txt
