@@ -90,6 +90,16 @@ curl -i -X POST http://localhost:3000/inscripciones \
 curl -i http://localhost:3000/estudiantes/1/inscripciones
 ```
 
+## Cómo funciona por dentro
+
+- **[Anatomía de una solicitud HTTP](https://claude.ai/code/artifact/6e1e7891-93e7-4f01-bdd7-9e9071c287d4)** — explicación visual del recorrido
+  completo, pensada para quien no escribió este código.
+- [`CICLO-SOLICITUD-RESPUESTA.md`](CICLO-SOLICITUD-RESPUESTA.md) — los mismos
+  diagramas en el repositorio: recorrido, árbol de códigos de estado, capas del
+  proyecto y encajado Ethernet/IP/TCP/HTTP.
+- [`BITACORA-TDD.md`](BITACORA-TDD.md) — cómo se construyó: cada rojo, cada verde
+  y las pruebas de mutación, con la salida real de cada corrida.
+
 ## Demostración con analizador de paquetes
 
 ```bash
@@ -118,6 +128,7 @@ unidad-1/
 │   ├── pruebas/servidor-de-prueba.ts   levanta la app en un puerto libre
 │   ├── pruebas/suma.fixture.ts         ejemplos compartidos por los dos niveles
 │   └── servidor.ts                     punto de entrada: sólo escucha
+├── CICLO-SOLICITUD-RESPUESTA.md        diagramas del recorrido de una solicitud
 ├── demo/                               ← demostración para la clase
 │   ├── captura-http.sh                 levanta, ejercita y captura el tráfico
 │   ├── GUION-DEMO.md                   qué instalar y cómo leer la captura

@@ -9,12 +9,27 @@ backend sobre el que se aplica TDD.
 
 | Ruta | Qué es |
 | ---- | ------ |
-| `backend/unidad-1/` | Servidor HTTP en TypeScript. Historia de inscripciones desarrollada con TDD, 57 pruebas Vitest y 16 escenarios Cucumber |
+| `backend/unidad-1/` | Servidor HTTP en TypeScript. Desarrollado con TDD: 64 pruebas Vitest y 23 escenarios Cucumber |
 | `backend/unidad-1/BITACORA-TDD.md` | Evidencia del ciclo rojo-verde-refactor, prueba de mutación y lectura de cobertura |
+| `backend/unidad-1/CICLO-SOLICITUD-RESPUESTA.md` | Diagramas del recorrido de una solicitud, del árbol de códigos de estado y de las capas |
+| `backend/unidad-1/demo/` | Demostración con analizador de paquetes: script, guion de clase y transcripción |
 | `curaduria-unidad1.md` | Curaduría de las cuatro fuentes en español y guión de exposición de la Unidad 1 |
 | `curaduria-unidad1.html` | La misma curaduría, generada desde el `.md` |
 | `TDD-to-backend.md` | Consigna del docente: la kata de `suma` con Vitest |
 | `Planificacion_*.docx`, `Guia_Docente_*.docx`, `Clase 1_*.docx` | Documentos de cátedra |
+
+## Para entender cómo está hecho
+
+Una explicación visual del recorrido completo de una solicitud —las capas, los
+códigos de estado, `HEAD` y cómo se construyó con TDD—, pensada para quien tenga
+que rendir la unidad:
+
+**[Anatomía de una solicitud HTTP](https://claude.ai/code/artifact/6e1e7891-93e7-4f01-bdd7-9e9071c287d4)**
+
+En el repositorio, lo mismo por escrito:
+[`CICLO-SOLICITUD-RESPUESTA.md`](backend/unidad-1/CICLO-SOLICITUD-RESPUESTA.md)
+(diagramas) y [`BITACORA-TDD.md`](backend/unidad-1/BITACORA-TDD.md) (el ciclo de
+trabajo, con la salida real de cada corrida).
 
 ## Cómo correr el backend
 
