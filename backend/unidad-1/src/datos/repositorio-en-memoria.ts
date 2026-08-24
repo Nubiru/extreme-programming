@@ -1,4 +1,5 @@
 import type { EstadoAcademico, Inscripcion } from "../dominio/inscripciones.ts";
+import type { Elemento } from "../dominio/vector.ts";
 
 /**
  * Persistencia en memoria. Sigue sin haber base de datos: lo que importa acá es
@@ -8,6 +9,12 @@ import type { EstadoAcademico, Inscripcion } from "../dominio/inscripciones.ts";
 export interface Repositorio {
   estado(): EstadoAcademico;
   agregarInscripcion(inscripcion: Inscripcion): void;
+
+  // Vector didáctico de la Unidad 1: sirve para ver el efecto de un POST.
+  vector(): readonly Elemento[];
+  /** Agrega al final y devuelve la posición en la que quedó. */
+  agregarAlVector(elemento: Elemento): number;
+  vaciarVector(): void;
 }
 
 export function crearRepositorioEnMemoria(): Repositorio {
@@ -23,11 +30,18 @@ export function crearRepositorioEnMemoria(): Repositorio {
   ];
 
   const inscripciones: Inscripcion[] = [];
+  const vector: Elemento[] = [];
 
   return {
     estado: () => ({ estudiantes, materias, inscripciones }),
     agregarInscripcion: (inscripcion) => {
       inscripciones.push(inscripcion);
+    },
+
+    vector: () => vector,
+    agregarAlVector: (elemento) => vector.push(elemento) - 1,
+    vaciarVector: () => {
+      vector.length = 0;
     }
   };
 }

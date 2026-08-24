@@ -83,6 +83,9 @@ Deja dos archivos en `demo/salida/`:
 | `GET` | `/estudiantes/:id` | 200 / 404 / 400 | Parámetro de ruta y sus tres desenlaces. |
 | `GET` | `/estudiantes/:id/inscripciones` | 200 | Subrecurso: el efecto del `POST` es observable. |
 | `POST` | `/inscripciones` | 201 / 400 / 404 / 409 | Creación, con `Location` apuntando al recurso creado. |
+| `GET` `POST` `DELETE` | `/vector` | 200 / 201 / 204 / 400 | El efecto de un `POST`, visible con el `GET` siguiente. |
+| `GET` | `/vector/:indice` | 200 / 400 / 404 | Un elemento por su posición. |
+| todos | `/eco` | 200 | Devuelve el mensaje recibido: dónde viajó cada dato. |
 | `HEAD` | cualquier ruta de `GET` | igual que `GET` | Los mismos encabezados, sin cuerpo. |
 | `OPTIONS` | cualquier ruta conocida | 204 | Encabezado `Allow` con los métodos admitidos. |
 | cualquier otro | ruta conocida | 405 | La ruta existe, la operación no. |
@@ -233,7 +236,119 @@ del artículo. El `ACK` que vuelve lleva el número del próximo byte esperado.
 
 ---
 
-## 6. Respuestas rápidas para la defensa
+## 6. La conversación narrada
+
+`captura-http.sh` dispara 21 llamadas seguidas: sirve para revisar el contrato, pero
+en la captura queda un bloque compacto difícil de seguir. Para explicar en clase hay
+un segundo guion:
+
+```bash
+./demo/conversacion.sh                 # 13 pasos, con pausa entre uno y otro
+./demo/conversacion.sh --sin-captura   # sin sudo
+PAUSA=0 ./demo/conversacion.sh         # sin esperas, para una corrida rápida
+```
+
+Tres diferencias que lo hacen más legible:
+
+1. **Es un diálogo con principio y final.** El vector arranca vacío, se llena, se
+   consulta, se filtra, se equivoca, se vacía. Cada paso se entiende por el anterior.
+2. **Hay pausas.** La columna *Time* de Wireshark separa visiblemente un paso del
+   siguiente, en vez de mostrar 21 solicitudes en 300 milisegundos.
+3. **Cada paso se anuncia dentro de la captura.** Antes de cada uno, el cliente pide:
+
+```
+GET /eco?paso=03&titulo=agrega-un-elemento-por-la-url
+```
+
+Ese pedido no guarda nada: existe para que el título del paso quede escrito en el
+listado de Wireshark. Como la URL viaja en texto plano dentro del paquete, la propia
+captura queda indexada.
+
+### Filtros para proyectar
+
+| Filtro | Muestra |
+|---|---|
+| `http.request.uri contains "paso="` | Sólo las marcas: el índice de la clase, 13 renglones |
+| `http.request.method == "POST"` | Sólo los cuatro POST |
+| `frame contains "hola"` | Cualquier paquete que contenga esa palabra — la prueba de que HTTP no está cifrado |
+| `tcp.stream == 3` | Una conversación TCP completa, del SYN al FIN |
+
+El tercero es el más contundente: escribir `frame contains "hola"` y que aparezca el
+paquete demuestra, sin explicar nada, que todo lo que viaja por HTTP se lee tal cual.
+Es la mejor introducción a por qué existe HTTPS.
+
+---
+
+## 7. Dónde pueden viajar los datos
+
+La pregunta «¿se puede mandar el dato en la URL?» tiene respuesta corta —sí— y una
+larga que conviene mostrar. El servidor acepta el mismo elemento por dos caminos:
+
+```bash
+curl -i -X POST -H 'Content-Type: application/json' \
+  -d '{"elemento":42}' http://127.0.0.1:3000/vector      # tipo: numero
+
+curl -i -X POST 'http://127.0.0.1:3000/vector?elemento=42'  # tipo: texto
+```
+
+**La respuesta dice `tipo`, y ahí está toda la lección**: por la URL todo llega como
+texto, porque una URL no tiene tipos. En un cuerpo JSON, `42` es un número y `"42"`
+es una cadena. Si vienen los dos, gana el cuerpo.
+
+| Ubicación | Ejemplo | Para qué sirve | Qué cuesta |
+|---|---|---|---|
+| Ruta | `/vector/0` | Identificar un recurso | — |
+| Consulta | `/vector?contiene=cha` | Filtrar, ordenar, paginar | Todo es texto; queda en registros, historial y `Referer` |
+| Encabezado | `X-Materia: backend` | Metadatos de la solicitud | No es para datos del recurso |
+| Cuerpo | `{"elemento":42}` | Enviar una representación con tipos y estructura | No se ve en la barra del navegador |
+
+Para no explicarlo de memoria, está `/eco`, que devuelve el mensaje tal como llegó:
+
+```bash
+curl -s -X POST -H 'X-Materia: backend' -d '{"elemento":"en el cuerpo"}' \
+  'http://127.0.0.1:3000/eco?elemento=en-la-url&otro=dato' | python3 -m json.tool
+```
+
+Una sola respuesta muestra el método, la ruta, los parámetros de consulta, todos los
+encabezados y el cuerpo —crudo y ya interpretado—. Es el paso 07 de la conversación.
+
+---
+
+## 8. Cuando la captura no muestra lo que esperás
+
+El problema más común no es Wireshark: es estar mirando la interfaz equivocada.
+
+**Un pedido desde la misma computadora nunca sale por la placa de red.** El núcleo
+ve que la dirección es suya y lo entrega internamente, incluso cuando se usa la
+dirección de la red local. Por eso una captura de loopback puede mostrar
+`192.168.0.11 → 192.168.0.11`: la dirección de la red, sin red de por medio.
+
+| Quién hace el pedido | Por dónde viaja | Dónde capturar |
+|---|---|---|
+| La misma máquina | Loopback | `lo` · en Windows, «Adapter for loopback traffic capture» |
+| Otro dispositivo (un celular) | La placa de red | `wlp0s20f3` · en Windows, «Wi-Fi» |
+
+En Linux se puede evitar el problema capturando en todas a la vez: `tshark -i any`.
+En Windows no existe `any`, pero se pueden seleccionar varias interfaces con
+Ctrl+clic en la pantalla inicial de Wireshark. Y hay un truco rápido: cada interfaz
+tiene una línea de actividad al costado — hacer el pedido y mirar cuál se mueve.
+
+Si con la interfaz correcta sigue sin aparecer nada, el orden de revisión es:
+
+| Síntoma | Causa | Comprobación |
+|---|---|---|
+| No aparece nada en ninguna interfaz | El pedido no llega: otra red, o aislamiento de clientes en el Wi-Fi | Probar desde otra máquina de la misma red |
+| `SYN` repetidos sin respuesta | El cortafuegos lo descarta | `sudo ufw allow 3000/tcp` · en Windows, permitir Node en redes privadas |
+| `SYN` → `RST` | Nadie escucha en esa dirección | `ss -ltn \| grep 3000`: tiene que decir `0.0.0.0:3000`, no `127.0.0.1:3000` |
+| El celular muestra un error de conexión segura | El navegador forzó HTTPS al puerto 443 | Escribir `http://` completo en la barra |
+
+Que funcione desde un celular vale el esfuerzo: es la única forma de mostrar en la
+captura direcciones de origen y destino distintas, una trama Ethernet de verdad con
+sus MAC y el MTU de 1500 bytes del que habla el artículo.
+
+---
+
+## 9. Respuestas rápidas para la defensa
 
 | Pregunta de la consigna | Qué señalar en la demo |
 |---|---|

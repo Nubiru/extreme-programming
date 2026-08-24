@@ -95,12 +95,39 @@ nada avisara. El script ahora verifica que el puerto esté libre antes de arranc
 corta con un mensaje. Es el mismo punto de la sección 3 de la consigna —dos procesos
 no pueden escuchar el mismo puerto— visto como un fallo concreto.
 
+## Cuarta historia: el vector didáctico y `/eco`
+
+Motivo: mostrar en clase qué hace un `POST` sin una base de datos de por medio, y
+poder responder «¿el dato puede ir en la URL?» con una demostración en vez de una
+explicación.
+
+| # | Fase | Acción | Salida observada |
+|---|------|--------|------------------|
+| 1 | **Rojo (unitario, dominio)** | `vector.test.ts` antes del módulo | `Cannot find module './vector.ts'` |
+| 2 | Verde | `validarElemento` y `describir`, funciones puras | `80 passed (80)` |
+| 3 | **Rojo (unitario, HTTP)** | 18 pruebas de contrato antes de tocar el router | `18 failed | 80 passed (98)` |
+| 4 | Verde | Rutas `/vector`, `/vector/:indice` y `/eco` + el vector en el repositorio | `98 passed (98)` |
+| 5 | **Rojo (aceptación)** | `vector.feature` con 8 escenarios | `8 undefined · 32 pasos sin definir` |
+| 6 | Verde | `vector.pasos.ts` | `31 scenarios · 161 steps` |
+| 7 | Cobertura | El reporte marcó `aplicacion.ts` en 98,43 % | Faltaba ejercitar el cuerpo ilegible en `POST /vector`; se agregó la prueba → 100 % |
+
+**Decisión de diseño registrada.** El elemento se acepta por dos caminos: el cuerpo
+JSON y el parámetro de consulta. El segundo no es una buena práctica —por la URL todo
+llega como texto y queda escrito en registros e historial— pero se admite a propósito
+para que la diferencia sea observable: la respuesta incluye `tipo`, y `{"elemento":42}`
+produce `numero` mientras que `?elemento=42` produce `texto`. Si vienen los dos, gana
+el cuerpo, y hay una prueba que lo fija.
+
+**Contraste deliberado con las inscripciones.** Repetir `POST /vector` agrega dos
+elementos; repetir `POST /inscripciones` responde `409`. Los dos son correctos: `POST`
+no es idempotente, y qué significa repetirlo lo decide el recurso, no el método.
+
 ## Estado final
 
 ```
 tsc --noEmit          sin errores
-vitest run            3 archivos · 64 pruebas en verde
-cucumber-js           23 escenarios · 105 pasos en verde
+vitest run            5 archivos · 99 pruebas en verde
+cucumber-js           31 escenarios · 161 pasos en verde
 cobertura             100 % líneas · 96,34 % ramas
 ```
 

@@ -5,6 +5,7 @@ import {
   validarSolicitud,
   type MotivoRechazo
 } from "../dominio/inscripciones.ts";
+import { describir, validarElemento } from "../dominio/vector.ts";
 import {
   crearRepositorioEnMemoria,
   type Repositorio
@@ -44,7 +45,10 @@ const RUTAS: ReadonlyArray<{ patron: RegExp; metodos: readonly string[] }> = [
   { patron: /^\/materias$/, metodos: ["GET", "HEAD"] },
   { patron: /^\/estudiantes\/[^/]+$/, metodos: ["GET", "HEAD"] },
   { patron: /^\/estudiantes\/[^/]+\/inscripciones$/, metodos: ["GET", "HEAD"] },
-  { patron: /^\/inscripciones$/, metodos: ["POST"] }
+  { patron: /^\/inscripciones$/, metodos: ["POST"] },
+  { patron: /^\/vector$/, metodos: ["GET", "HEAD", "POST", "DELETE"] },
+  { patron: /^\/vector\/[^/]+$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/eco$/, metodos: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"] }
 ];
 
 export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListener {
@@ -64,6 +68,10 @@ export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListe
 
     const ruta = (solicitud.url ?? "").split("?")[0] ?? "";
     const partes = ruta.split("/").filter((parte) => parte !== "");
+
+    // Lo que viene después del "?": el mismo mensaje puede traer datos en la
+    // ruta, en la consulta, en los encabezados y en el cuerpo. `/eco` los muestra.
+    const consulta = new URLSearchParams((solicitud.url ?? "").split("?").slice(1).join("?"));
 
     /**
      * Escribe la respuesta. Serializa una sola vez para poder anunciar
@@ -163,6 +171,106 @@ export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListe
       }
     }
 
+    // GET · POST · DELETE  /vector
+    if (partes.length === 1 && partes[0] === "vector") {
+      if (metodo === "GET") {
+        responder(200, describir(repositorio.vector(), consulta.get("contiene") ?? undefined));
+        return;
+      }
+
+      if (metodo === "DELETE") {
+        repositorio.vaciarVector();
+        responder(204);
+        return;
+      }
+
+      let cuerpo: unknown;
+
+      try {
+        cuerpo = await leerJson(solicitud);
+      } catch {
+        responder(400, { error: "El cuerpo no es JSON válido" });
+        return;
+      }
+
+      // El dato puede llegar por dos caminos. El cuerpo es el lugar correcto para
+      // un POST; la consulta se admite para poder mostrar en clase que también es
+      // posible —y qué se pierde—: por la URL todo llega como texto.
+      const enviado =
+        typeof cuerpo === "object" && cuerpo !== null && "elemento" in cuerpo
+          ? (cuerpo as { elemento: unknown }).elemento
+          : consulta.get("elemento");
+
+      const validacion = validarElemento(enviado);
+
+      if (!validacion.valido) {
+        responder(400, { error: validacion.error });
+        return;
+      }
+
+      const indice = repositorio.agregarAlVector(validacion.elemento);
+
+      respuesta.setHeader("Location", `/vector/${indice}`);
+      responder(201, {
+        indice,
+        elemento: validacion.elemento,
+        tipo: typeof validacion.elemento === "number" ? "numero" : "texto",
+        total: repositorio.vector().length
+      });
+      return;
+    }
+
+    // GET /vector/:indice
+    if (metodo === "GET" && partes.length === 2 && partes[0] === "vector") {
+      const indice = Number(partes[1]);
+
+      if (!Number.isInteger(indice)) {
+        responder(400, { error: "El índice debe ser un número entero" });
+        return;
+      }
+
+      const encontrado = describir(repositorio.vector()).elementos[indice];
+
+      if (encontrado === undefined) {
+        responder(404, { error: "No hay ningún elemento en esa posición" });
+        return;
+      }
+
+      responder(200, encontrado);
+      return;
+    }
+
+    // Cualquier método sobre /eco: devuelve el mensaje recibido, sin guardar nada.
+    if (partes.length === 1 && partes[0] === "eco") {
+      const crudo = await leerTexto(solicitud);
+      let interpretado: unknown = null;
+      let esJsonValido = false;
+
+      if (crudo !== "") {
+        try {
+          interpretado = JSON.parse(crudo);
+          esJsonValido = true;
+        } catch {
+          // Un cuerpo ilegible no es un error acá: mostrarlo es justamente el punto.
+        }
+      }
+
+      responder(200, {
+        metodo: metodoSolicitado,
+        url: solicitud.url,
+        ruta,
+        consulta: Object.fromEntries(consulta),
+        encabezados: solicitud.headers,
+        cuerpo: {
+          crudo,
+          bytes: Buffer.byteLength(crudo, "utf8"),
+          esJsonValido,
+          interpretado
+        }
+      });
+      return;
+    }
+
     // POST /inscripciones
     if (metodo === "POST" && partes.length === 1 && partes[0] === "inscripciones") {
       let cuerpo: unknown;
@@ -200,15 +308,20 @@ export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListe
   };
 }
 
-/** Acumula el cuerpo de la solicitud y lo interpreta como JSON. */
-async function leerJson(solicitud: IncomingMessage): Promise<unknown> {
+/** Acumula el cuerpo de la solicitud tal como llegó, sin interpretarlo. */
+async function leerTexto(solicitud: IncomingMessage): Promise<string> {
   const trozos: Buffer[] = [];
 
   for await (const trozo of solicitud) {
     trozos.push(trozo as Buffer);
   }
 
-  const texto = Buffer.concat(trozos).toString("utf8");
+  return Buffer.concat(trozos).toString("utf8");
+}
+
+/** El mismo cuerpo, interpretado como JSON. Un cuerpo vacío es un objeto vacío. */
+async function leerJson(solicitud: IncomingMessage): Promise<unknown> {
+  const texto = await leerTexto(solicitud);
 
   return texto === "" ? {} : JSON.parse(texto);
 }

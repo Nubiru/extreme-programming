@@ -47,13 +47,27 @@ trap limpiar EXIT
 # Escribe en pantalla y en la transcripción a la vez.
 registrar() { printf '%s\n' "$*" | tee -a "$TRANSCRIPCION"; }
 
+# Devuelve los argumentos tal como habría que escribirlos en la terminal: sin
+# esto, la transcripción muestra  -d {"elemento":42}  y no se puede copiar.
+citar() {
+  local pieza salida=""
+  for pieza in "$@"; do
+    if [[ "$pieza" =~ ^[A-Za-z0-9_@%+=:,./-]+$ ]]; then
+      salida+="$pieza "
+    else
+      salida+="'${pieza//\'/\'\\''}' "
+    fi
+  done
+  printf '%s' "${salida% }"
+}
+
 # Ejecuta un `curl`, mostrando primero el comando y después la respuesta cruda.
 llamar() {
   local titulo="$1"; shift
   registrar ""
   registrar "───────────────────────────────────────────────────────────────"
   registrar "▶ $titulo"
-  registrar "\$ curl $*"
+  registrar "\$ curl $(citar "$@")"
   registrar ""
   curl -sS "$@" 2>&1 | sed 's/\r$//' | tee -a "$TRANSCRIPCION"
   registrar ""

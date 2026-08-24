@@ -1,0 +1,232 @@
+Transcripción de una corrida real de demo/conversacion.sh --sin-captura
+Servidor: node src/servidor.ts · Node v22.21.1 · 13 pasos narrados
+Se regenera con: ./demo/conversacion.sh
+================================================================================
+
+Conversación entre un cliente (curl) y un servidor (node) en http://127.0.0.1:3000
+Cada paso queda anunciado en la captura como  GET /eco?paso=NN&titulo=...
+
+══════════════════════════════════════════════════════════════════
+ Primera parte · el cliente se presenta y mira qué hay
+══════════════════════════════════════════════════════════════════
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 01 · El cliente pregunta si el servidor está vivo
+│ En la captura: los tres paquetes del saludo TCP —SYN, SYN-ACK, ACK— antes del primer texto HTTP
+│
+│ $ curl -i http://127.0.0.1:3000/salud
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 50
+Date: Mon, 24 Aug 2026 23:42:31 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"estado":"ok","fecha":"2026-08-24T23:42:31.982Z"}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 02 · Pregunta qué hay guardado en el vector
+│ En la captura: la respuesta dice total 0: todavía no se guardó nada
+│
+│ $ curl -i http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 39
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"total":0,"cantidad":0,"elementos":[]}
+
+══════════════════════════════════════════════════════════════════
+ Segunda parte · el POST y su efecto
+══════════════════════════════════════════════════════════════════
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 03 · Agrega un elemento mandándolo en el cuerpo
+│ En la captura: el paquete lleva la línea POST y, más abajo, el JSON en texto plano
+│
+│ $ curl -i -X POST -H 'Content-Type: application/json' -d '{"elemento":"hola"}' http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /vector/0
+Content-Length: 55
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"indice":0,"elemento":"hola","tipo":"texto","total":1}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 04 · Vuelve a preguntar qué hay en el vector
+│ En la captura: total pasó de 0 a 1: eso es lo que hizo el POST
+│
+│ $ curl -i http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 84
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"total":1,"cantidad":1,"elementos":[{"indice":0,"elemento":"hola","tipo":"texto"}]}
+
+══════════════════════════════════════════════════════════════════
+ Tercera parte · por dónde puede viajar un dato
+══════════════════════════════════════════════════════════════════
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 05 · Agrega otro elemento, ahora escrito en la propia URL
+│ En la captura: el dato se lee en la columna Info del listado, sin abrir el paquete
+│
+│ $ curl -i -X POST 'http://127.0.0.1:3000/vector?elemento=desdeLaUrl'
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /vector/1
+Content-Length: 61
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"indice":1,"elemento":"desdeLaUrl","tipo":"texto","total":2}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 06 · Agrega el número 42 en el cuerpo, con tipo
+│ En la captura: la respuesta dice tipo numero; el paso anterior decía tipo texto
+│
+│ $ curl -i -X POST -H 'Content-Type: application/json' -d '{"elemento":42}' http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /vector/2
+Content-Length: 52
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"indice":2,"elemento":42,"tipo":"numero","total":3}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 07 · Pide el eco del mensaje para ver dónde viajó cada dato
+│ En la captura: una sola respuesta muestra método, ruta, consulta, encabezados y cuerpo
+│
+│ $ curl -i -X POST -H 'Content-Type: application/json' -H 'X-Materia: backend' -d '{"elemento":"en el cuerpo"}' 'http://127.0.0.1:3000/eco?elemento=en-la-url&otro=dato'
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 409
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"metodo":"POST","url":"/eco?elemento=en-la-url&otro=dato","ruta":"/eco","consulta":{"elemento":"en-la-url","otro":"dato"},"encabezados":{"host":"127.0.0.1:3000","user-agent":"curl/8.5.0","accept":"*/*","content-type":"application/json","x-materia":"backend","content-length":"27"},"cuerpo":{"crudo":"{\"elemento\":\"en el cuerpo\"}","bytes":27,"esJsonValido":true,"interpretado":{"elemento":"en el cuerpo"}}}
+
+══════════════════════════════════════════════════════════════════
+ Cuarta parte · consultar, filtrar y equivocarse
+══════════════════════════════════════════════════════════════════
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 08 · Pide un elemento puntual por su posición
+│ En la captura: la posición viaja en la ruta, no en la consulta: identifica un recurso
+│
+│ $ curl -i http://127.0.0.1:3000/vector/0
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 45
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"indice":0,"elemento":"hola","tipo":"texto"}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 09 · Filtra el vector con un parámetro de consulta
+│ En la captura: la consulta no identifica un recurso: lo filtra. total sigue en 3
+│
+│ $ curl -i 'http://127.0.0.1:3000/vector?contiene=desde'
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 90
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"total":3,"cantidad":1,"elementos":[{"indice":1,"elemento":"desdeLaUrl","tipo":"texto"}]}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 10 · Intenta guardar un elemento vacío
+│ En la captura: 400: el servidor entendió el mensaje y lo rechazó por su contenido
+│
+│ $ curl -i -X POST -H 'Content-Type: application/json' -d '{"elemento":"   "}' http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Content-Length: 70
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"El campo elemento debe ser un texto no vacío o un número"}
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 11 · Pide una posición que no existe
+│ En la captura: 404: la ruta es válida, el elemento no está
+│
+│ $ curl -i http://127.0.0.1:3000/vector/99
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Content-Length: 52
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"No hay ningún elemento en esa posición"}
+
+══════════════════════════════════════════════════════════════════
+ Quinta parte · deshacer y despedirse
+══════════════════════════════════════════════════════════════════
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 12 · Vacía el vector
+│ En la captura: 204: respuesta sin cuerpo. En la captura no hay JSON detrás de los encabezados
+│
+│ $ curl -i -X DELETE http://127.0.0.1:3000/vector
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 204 No Content
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+
+╭───────────────────────────────────────────────────────────────
+│ PASO 13 · Comprueba que quedó vacío, y de paso reutiliza la conexión
+│ En la captura: dos solicitudes HTTP dentro de un mismo saludo TCP: keep-alive
+│
+│ $ curl -i http://127.0.0.1:3000/vector http://127.0.0.1:3000/salud
+╰───────────────────────────────────────────────────────────────
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 39
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"total":0,"cantidad":0,"elementos":[]}HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 50
+Date: Mon, 24 Aug 2026 23:42:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"estado":"ok","fecha":"2026-08-24T23:42:32.706Z"}
+
+Transcripción: /home/gabiota/personal/study/tercero/prg. extrema/backend/unidad-1/demo/salida/conversacion.txt

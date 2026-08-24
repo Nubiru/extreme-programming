@@ -36,10 +36,46 @@ Para cambiar el puerto: `PORT=4000 npm start`.
 | `GET`  | `/estudiantes/:id`            | `200` el estudiante · `400` id no entero · `404` no existe |
 | `GET`  | `/estudiantes/:id/inscripciones` | `200` inscripciones del estudiante · `404` no existe |
 | `POST` | `/inscripciones`              | `201` inscripción creada · ver tabla de rechazos        |
+| `GET`  | `/vector`                     | `200` el vector completo · `?contiene=` filtra          |
+| `POST` | `/vector`                     | `201` agrega un elemento · `400` si es inválido         |
+| `GET`  | `/vector/:indice`             | `200` un elemento · `400` índice no entero · `404` fuera de rango |
+| `DELETE` | `/vector`                   | `204` vacía el vector                                   |
+| todos  | `/eco`                        | `200` devuelve el mensaje recibido, sin guardar nada    |
 | `HEAD` | cualquier ruta de `GET`       | los mismos encabezados que `GET`, sin cuerpo            |
 | `OPTIONS` | cualquier ruta conocida    | `204` con `Allow` listando los métodos admitidos        |
 | otro   | ruta conocida                 | `405` con `Allow`: la ruta existe, la operación no      |
 | —      | ruta desconocida              | `404` con un mensaje de error                           |
+
+### `/vector` y `/eco`: los dos endpoints didácticos
+
+`/vector` es un arreglo en memoria: el sustituto más simple de una base de datos.
+Sirve para ver el efecto de un `POST` sin nada de por medio — se agrega un elemento
+y el `GET` siguiente lo muestra:
+
+```bash
+curl -i -X POST -H 'Content-Type: application/json' \
+  -d '{"elemento":"hola"}' http://localhost:3000/vector   # 201 · Location: /vector/0
+curl -i http://localhost:3000/vector                       # total pasó de 0 a 1
+```
+
+El dato puede viajar por dos caminos, y los dos están admitidos a propósito:
+
+| Camino | Ejemplo | Qué se pierde |
+| ------ | ------- | ------------- |
+| Cuerpo JSON | `-d '{"elemento":42}'` | nada: JSON distingue el número `42` del texto `"42"` |
+| Consulta en la URL | `POST /vector?elemento=42` | los tipos: todo llega como texto; además queda escrito en registros e historial |
+
+Si vienen los dos, gana el cuerpo. La respuesta incluye `tipo`, así que la
+diferencia es observable sin mirar el código.
+
+`/eco` no guarda nada: devuelve el mensaje tal como llegó —método, ruta, parámetros
+de consulta, encabezados, cuerpo crudo e interpretado—. Es la forma más directa de
+mostrar en qué parte de una solicitud viaja cada dato.
+
+```bash
+curl -s -X POST -H 'X-Materia: backend' -d '{"a":1}' \
+  'http://localhost:3000/eco?b=2' | python3 -m json.tool
+```
 
 `HEAD` se resuelve con el mismo manejador que `GET` y se omite el cuerpo al escribir
 la respuesta, así que ninguna ruta puede quedar con `GET` y sin `HEAD`. Todas las
@@ -102,13 +138,18 @@ curl -i http://localhost:3000/estudiantes/1/inscripciones
 
 ## Demostración con analizador de paquetes
 
+Hay dos guiones, con propósitos distintos:
+
 ```bash
-./demo/captura-http.sh              # captura + 21 solicitudes (pide sudo)
-./demo/captura-http.sh --sin-captura # sólo las solicitudes, sin sudo
+./demo/captura-http.sh    # 21 llamadas seguidas: el contrato completo, para revisar
+./demo/conversacion.sh    # 13 pasos narrados y pausados: para explicar en clase
 ```
 
-Levanta el servidor, ejercita el contrato completo con `curl -i` y captura el tráfico
-con `tshark` para abrirlo con Wireshark. El guion de la clase —qué instalar, qué
+`conversacion.sh` cuenta un diálogo con principio y final —el vector arranca vacío,
+se llena, se consulta, se vacía— y **anuncia cada paso dentro de la propia captura**:
+antes de cada uno pide `GET /eco?paso=03&titulo=agrega-un-elemento-por-la-url`. Como
+la URL viaja en texto plano, esos títulos aparecen en el listado de Wireshark y
+funcionan como índice. Con `--sin-captura` corre sin sudo; con `PAUSA=0`, sin esperas. El guion de la clase —qué instalar, qué
 mostrar y cómo leer la captura capa por capa— está en
 [`demo/GUION-DEMO.md`](demo/GUION-DEMO.md); la salida de una corrida real quedó en
 [`demo/sesion-ejemplo.txt`](demo/sesion-ejemplo.txt).
@@ -120,6 +161,8 @@ unidad-1/
 ├── src/
 │   ├── dominio/inscripciones.ts        reglas puras: sin HTTP, sin Node
 │   ├── dominio/inscripciones.test.ts   pruebas unitarias
+│   ├── dominio/vector.ts               vector didáctico: validar y describir
+│   ├── dominio/vector.test.ts          pruebas unitarias
 │   ├── dominio/suma.ts                 kata de la Unidad 3, con validación
 │   ├── dominio/suma.test.ts            pruebas unitarias
 │   ├── datos/repositorio-en-memoria.ts persistencia sustituible
@@ -130,16 +173,20 @@ unidad-1/
 │   └── servidor.ts                     punto de entrada: sólo escucha
 ├── CICLO-SOLICITUD-RESPUESTA.md        diagramas del recorrido de una solicitud
 ├── demo/                               ← demostración para la clase
-│   ├── captura-http.sh                 levanta, ejercita y captura el tráfico
+│   ├── captura-http.sh                 21 llamadas: el contrato completo
+│   ├── conversacion.sh                 13 pasos narrados, con marcas en la captura
 │   ├── GUION-DEMO.md                   qué instalar y cómo leer la captura
-│   └── sesion-ejemplo.txt              transcripción de una corrida real
+│   ├── sesion-ejemplo.txt              transcripción de una corrida real
+│   └── conversacion-ejemplo.txt        la conversación, paso a paso
 ├── features/                           ← lo que Cucumber necesita
 │   ├── inscripciones.feature           @api · escenarios sobre el contrato HTTP
 │   ├── metodos-http.feature            @api · HEAD, OPTIONS y 405
+│   ├── vector.feature                  @api · el efecto de un POST
 │   ├── suma.feature                    @dominio · escenarios sobre la función
 │   ├── pasos/                          definiciones de pasos
 │   │   ├── inscripciones.pasos.ts
 │   │   ├── metodos.pasos.ts
+│   │   ├── vector.pasos.ts
 │   │   └── suma.pasos.ts
 │   └── soporte/mundo.ts                estado compartido por escenario y hooks
 ├── cucumber.json                       rutas, glob de pasos y formato
