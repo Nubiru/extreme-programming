@@ -20,6 +20,15 @@ ANFITRION="127.0.0.1"
 CAPTURAR="sí"
 [[ "${1:-}" == "--sin-captura" ]] && CAPTURAR="no"
 
+# Capturar paquetes es una operación privilegiada. Si el usuario pertenece al
+# grupo «wireshark» —opción que ofrece el instalador del paquete— dumpcap ya tiene
+# los permisos necesarios y no hace falta sudo.
+if [[ "$(id -u)" == "0" ]] || id -nG | grep -qw wireshark; then
+  SUDO=""
+else
+  SUDO="sudo"
+fi
+
 mkdir -p "$SALIDA"
 TRANSCRIPCION="$SALIDA/sesion.txt"
 CAPTURA="$SALIDA/trafico.pcapng"
@@ -29,7 +38,7 @@ pid_servidor=""
 pid_captura=""
 
 limpiar() {
-  [[ -n "$pid_captura"  ]] && sudo kill -INT "$pid_captura" 2>/dev/null || true
+  [[ -n "$pid_captura"  ]] && $SUDO kill -INT "$pid_captura" 2>/dev/null || true
   [[ -n "$pid_servidor" ]] && kill "$pid_servidor" 2>/dev/null || true
   wait 2>/dev/null || true
 }
@@ -73,12 +82,14 @@ done
 
 # ── 2. Captura ─────────────────────────────────────────────────────────────────
 if [[ "$CAPTURAR" == "sí" ]]; then
+  # Pedir la contraseña ahora, no cuando el proceso ya esté en segundo plano.
+  [[ -n "$SUDO" ]] && sudo -v
   if command -v tshark >/dev/null; then
-    sudo tshark -i lo -f "tcp port $PUERTO" -w "$CAPTURA" -q >"$SALIDA/captura.log" 2>&1 &
+    $SUDO tshark -i lo -f "tcp port $PUERTO" -w "$CAPTURA" -q >"$SALIDA/captura.log" 2>&1 &
     pid_captura=$!
     registrar "Capturando con tshark en la interfaz lo, filtro «tcp port $PUERTO»"
   elif command -v tcpdump >/dev/null; then
-    sudo tcpdump -i lo -s 0 -w "$CAPTURA" "tcp port $PUERTO" >"$SALIDA/captura.log" 2>&1 &
+    $SUDO tcpdump -i lo -s 0 -w "$CAPTURA" "tcp port $PUERTO" >"$SALIDA/captura.log" 2>&1 &
     pid_captura=$!
     registrar "Capturando con tcpdump en la interfaz lo, filtro «tcp port $PUERTO»"
   else
@@ -189,7 +200,7 @@ registrar ""
 registrar "Transcripción: $TRANSCRIPCION"
 
 if [[ -f "$CAPTURA" ]] && command -v tshark >/dev/null; then
-  sudo chown "$(id -u):$(id -g)" "$CAPTURA" 2>/dev/null || true
+  $SUDO chown "$(id -u):$(id -g)" "$CAPTURA" 2>/dev/null || true
   registrar "Captura:       $CAPTURA"
   registrar ""
   registrar "── Resumen HTTP de la captura ─────────────────────────────────"
@@ -200,6 +211,6 @@ if [[ -f "$CAPTURA" ]] && command -v tshark >/dev/null; then
   registrar ""
   registrar "Abrilo con:  wireshark $CAPTURA"
 elif [[ -f "$CAPTURA" ]]; then
-  sudo chown "$(id -u):$(id -g)" "$CAPTURA" 2>/dev/null || true
+  $SUDO chown "$(id -u):$(id -g)" "$CAPTURA" 2>/dev/null || true
   registrar "Captura:       $CAPTURA  (abrir con Wireshark)"
 fi

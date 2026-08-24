@@ -16,11 +16,11 @@ $ curl -i http://127.0.0.1:3000/salud
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 50
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"estado":"ok","fecha":"2026-08-24T22:37:05.057Z"}
+{"estado":"ok","fecha":"2026-08-24T22:40:30.019Z"}
 
 ───────────────────────────────────────────────────────────────
 ▶ GET /ruta-inexistente — una ruta desconocida responde 404, no 200
@@ -29,7 +29,7 @@ $ curl -i http://127.0.0.1:3000/ruta-inexistente
 HTTP/1.1 404 Not Found
 Content-Type: application/json; charset=utf-8
 Content-Length: 33
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -46,11 +46,11 @@ $ curl -i http://127.0.0.1:3000/hora
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 35
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"hora":"2026-08-24T22:37:05.089Z"}
+{"hora":"2026-08-24T22:40:30.078Z"}
 
 ───────────────────────────────────────────────────────────────
 ▶ GET /estudiantes/42 — parámetro de ruta: identifica un recurso
@@ -59,7 +59,7 @@ $ curl -i http://127.0.0.1:3000/estudiantes/42
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 47
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -72,7 +72,7 @@ $ curl -i http://127.0.0.1:3000/estudiantes/42?detalle=completo
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 47
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -85,7 +85,7 @@ $ curl -i http://127.0.0.1:3000/estudiantes/999
 HTTP/1.1 404 Not Found
 Content-Type: application/json; charset=utf-8
 Content-Length: 36
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -98,7 +98,7 @@ $ curl -i http://127.0.0.1:3000/estudiantes/abc
 HTTP/1.1 400 Bad Request
 Content-Type: application/json; charset=utf-8
 Content-Length: 44
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -111,7 +111,7 @@ $ curl -i http://127.0.0.1:3000/materias
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 175
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -128,7 +128,7 @@ $ curl -I http://127.0.0.1:3000/salud
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 50
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -141,7 +141,7 @@ $ curl -I http://127.0.0.1:3000/materias
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 175
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -154,7 +154,7 @@ $ curl -i -o /dev/null -D - http://127.0.0.1:3000/materias
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 175
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -167,7 +167,7 @@ $ curl -I http://127.0.0.1:3000/ruta-inexistente
 HTTP/1.1 404 Not Found
 Content-Type: application/json; charset=utf-8
 Content-Length: 33
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -179,7 +179,7 @@ $ curl -i -X OPTIONS http://127.0.0.1:3000/materias
 
 HTTP/1.1 204 No Content
 Allow: GET, HEAD, OPTIONS
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -193,7 +193,7 @@ HTTP/1.1 405 Method Not Allowed
 Content-Type: application/json; charset=utf-8
 Allow: GET, HEAD, OPTIONS
 Content-Length: 32
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -207,7 +207,7 @@ HTTP/1.1 405 Method Not Allowed
 Content-Type: application/json; charset=utf-8
 Allow: POST, OPTIONS
 Content-Length: 32
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -225,11 +225,11 @@ HTTP/1.1 201 Created
 Content-Type: application/json; charset=utf-8
 Location: /inscripciones/1
 Content-Length: 83
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:37:05.312Z"}
+{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:40:30.334Z"}
 
 ───────────────────────────────────────────────────────────────
 ▶ POST /inscripciones repetido — 409: entiendo la solicitud, el estado no la admite
@@ -238,7 +238,7 @@ $ curl -i -X POST -H Content-Type: application/json -d {"estudianteId":1,"materi
 HTTP/1.1 409 Conflict
 Content-Type: application/json; charset=utf-8
 Content-Length: 60
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -251,7 +251,7 @@ $ curl -i -X POST -H Content-Type: application/json -d { esto no es json http://
 HTTP/1.1 400 Bad Request
 Content-Type: application/json; charset=utf-8
 Content-Length: 40
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -264,7 +264,7 @@ $ curl -i -X POST -H Content-Type: application/json -d {"estudianteId":42,"mater
 HTTP/1.1 409 Conflict
 Content-Type: application/json; charset=utf-8
 Content-Length: 41
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -277,11 +277,11 @@ $ curl -i http://127.0.0.1:3000/estudiantes/1/inscripciones
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 85
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-[{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:37:05.312Z"}]
+[{"id":1,"estudianteId":1,"materia":"algoritmos","fecha":"2026-08-24T22:40:30.334Z"}]
 
 ===============================================================
  Una conexión TCP, varias solicitudes HTTP (keep-alive)
@@ -294,17 +294,17 @@ $ curl -i http://127.0.0.1:3000/salud http://127.0.0.1:3000/hora
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 50
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"estado":"ok","fecha":"2026-08-24T22:37:05.402Z"}HTTP/1.1 200 OK
+{"estado":"ok","fecha":"2026-08-24T22:40:30.416Z"}HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Length: 35
-Date: Mon, 24 Aug 2026 22:37:05 GMT
+Date: Mon, 24 Aug 2026 22:40:30 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"hora":"2026-08-24T22:37:05.402Z"}
+{"hora":"2026-08-24T22:40:30.417Z"}
 
 Transcripción: /home/gabiota/personal/study/tercero/prg. extrema/backend/unidad-1/demo/salida/sesion.txt
