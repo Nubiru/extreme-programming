@@ -30,6 +30,23 @@ const RESPUESTA_POR_MOTIVO: Record<MotivoRechazo, { codigo: number; error: strin
   "sin-cupo": { codigo: 409, error: "La materia no tiene cupo disponible" }
 };
 
+/**
+ * Tabla de rutas: qué métodos admite cada forma de ruta.
+ *
+ * Existe para poder distinguir dos situaciones que un router ingenuo confunde:
+ * "no conozco ese recurso" (404) y "conozco el recurso, pero no esa operación
+ * sobre él" (405, con el encabezado `Allow` diciendo cuáles sí). También permite
+ * contestar `OPTIONS` sin repetir las reglas en otro lugar.
+ */
+const RUTAS: ReadonlyArray<{ patron: RegExp; metodos: readonly string[] }> = [
+  { patron: /^\/salud$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/hora$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/materias$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/estudiantes\/[^/]+$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/estudiantes\/[^/]+\/inscripciones$/, metodos: ["GET", "HEAD"] },
+  { patron: /^\/inscripciones$/, metodos: ["POST"] }
+];
+
 export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListener {
   const repositorio = opciones.repositorio ?? crearRepositorioEnMemoria();
   const reloj = opciones.reloj ?? (() => new Date());
@@ -37,14 +54,57 @@ export function crearAplicacion(opciones: OpcionesAplicacion = {}): RequestListe
   return async (solicitud, respuesta) => {
     respuesta.setHeader("Content-Type", "application/json; charset=utf-8");
 
-    const responder = (codigo: number, cuerpo: unknown): void => {
-      respuesta.writeHead(codigo);
-      respuesta.end(JSON.stringify(cuerpo));
-    };
+    const metodoSolicitado = solicitud.method ?? "";
 
-    const metodo = solicitud.method ?? "";
+    // HEAD es GET sin cuerpo. Se resuelve con el mismo manejador —abajo se lee
+    // `metodo`, no `metodoSolicitado`— y `responder` omite el cuerpo al final.
+    // De este modo ninguna ruta puede quedar con GET y sin HEAD.
+    const esHead = metodoSolicitado === "HEAD";
+    const metodo = esHead ? "GET" : metodoSolicitado;
+
     const ruta = (solicitud.url ?? "").split("?")[0] ?? "";
     const partes = ruta.split("/").filter((parte) => parte !== "");
+
+    /**
+     * Escribe la respuesta. Serializa una sola vez para poder anunciar
+     * `Content-Length`: el largo del cuerpo es información de la capa de
+     * aplicación, TCP no lo transporta. Sin ese encabezado el cliente sólo sabe
+     * que el mensaje terminó cuando se cierra la conexión (o por trozos).
+     * Con `cuerpo` indefinido se responde sin cuerpo alguno, como pide el 204.
+     */
+    const responder = (codigo: number, cuerpo?: unknown): void => {
+      if (cuerpo === undefined) {
+        respuesta.removeHeader("Content-Type");
+        respuesta.writeHead(codigo);
+        respuesta.end();
+        return;
+      }
+
+      const serializado = JSON.stringify(cuerpo);
+
+      respuesta.setHeader("Content-Length", Buffer.byteLength(serializado, "utf8"));
+      respuesta.writeHead(codigo);
+      respuesta.end(esHead ? undefined : serializado);
+    };
+
+    const conocida = RUTAS.find(({ patron }) => patron.test(ruta));
+
+    if (conocida !== undefined) {
+      // `OPTIONS` siempre se admite: es la forma de preguntarle a la ruta qué acepta.
+      const admitidos = [...conocida.metodos, "OPTIONS"].join(", ");
+
+      if (metodoSolicitado === "OPTIONS") {
+        respuesta.setHeader("Allow", admitidos);
+        responder(204);
+        return;
+      }
+
+      if (!conocida.metodos.includes(metodo)) {
+        respuesta.setHeader("Allow", admitidos);
+        responder(405, { error: "Método no permitido" });
+        return;
+      }
+    }
 
     // GET /salud
     if (metodo === "GET" && partes.length === 1 && partes[0] === "salud") {

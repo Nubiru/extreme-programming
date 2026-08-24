@@ -13,6 +13,11 @@ export class MundoDePruebas extends World {
   servidor!: ServidorDePrueba;
   respuesta!: Response;
   cuerpo: unknown;
+  texto = "";
+
+  // Escenarios que comparan dos respuestas entre sí (HEAD contra GET)
+  respuestaHead?: Response;
+  textoHead?: string;
 
   // Escenarios @dominio
   resultado: unknown;
@@ -22,6 +27,25 @@ export class MundoDePruebas extends World {
   async pedir(ruta: string, opciones?: RequestInit): Promise<void> {
     this.respuesta = await this.servidor.pedir(ruta, opciones);
     this.cuerpo = await this.respuesta.json();
+  }
+
+  /**
+   * Igual que `pedir`, pero sin interpretar el cuerpo como JSON: los escenarios
+   * de método (HEAD, OPTIONS) esperan respuestas sin cuerpo, y `json()` sobre
+   * una respuesta vacía lanza en vez de fallar como aserción.
+   */
+  async pedirTexto(ruta: string, opciones?: RequestInit): Promise<void> {
+    this.respuesta = await this.servidor.pedir(ruta, opciones);
+    this.texto = await this.respuesta.text();
+  }
+
+  /** Pide la misma ruta por HEAD y por GET para poder contrastar ambas respuestas. */
+  async compararHeadYGet(ruta: string): Promise<void> {
+    await this.pedirTexto(ruta, { method: "HEAD" });
+    this.respuestaHead = this.respuesta;
+    this.textoHead = this.texto;
+
+    await this.pedirTexto(ruta);
   }
 
   async inscribir(cuerpo: string): Promise<void> {

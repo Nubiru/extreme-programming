@@ -246,3 +246,79 @@ describe("GET /estudiantes/:id/inscripciones", () => {
     expect(await respuesta.json()).toEqual({ error: "Estudiante no encontrado" });
   });
 });
+
+/**
+ * Contrato a nivel de método y encabezado. Estas pruebas nacieron de la consigna
+ * de la Unidad 1 (sección 7: "casos de prueba" con `curl -i`) y de la demostración
+ * con analizador de paquetes: lo que se ve en Wireshark es exactamente esto.
+ *
+ * `HEAD` merece pruebas propias porque es el único método cuya respuesta no tiene
+ * cuerpo pero sí declara su tamaño: es la prueba de que `Content-Length` viaja en
+ * la capa de aplicación y no la calcula TCP.
+ */
+describe("Contrato HTTP · métodos y encabezados", () => {
+  let servidor: ServidorDePrueba;
+
+  beforeEach(async () => {
+    servidor = await levantar(crearAplicacion());
+  });
+
+  afterEach(async () => {
+    await servidor.cerrar();
+  });
+
+  it("responde HEAD /salud con el mismo código que GET y sin cuerpo", async () => {
+    const respuesta = await servidor.pedir("/salud", { method: "HEAD" });
+
+    expect(respuesta.status).toBe(200);
+    expect(await respuesta.text()).toBe("");
+  });
+
+  it("anuncia en HEAD el mismo Content-Length que tendría el cuerpo de GET", async () => {
+    const conCuerpo = await servidor.pedir("/materias");
+    const sinCuerpo = await servidor.pedir("/materias", { method: "HEAD" });
+
+    const bytes = Buffer.byteLength(await conCuerpo.text(), "utf8");
+
+    expect(sinCuerpo.headers.get("content-length")).toBe(String(bytes));
+    expect(conCuerpo.headers.get("content-length")).toBe(String(bytes));
+  });
+
+  it("responde HEAD sobre una ruta inexistente con 404 y sin cuerpo", async () => {
+    const respuesta = await servidor.pedir("/ruta-inexistente", { method: "HEAD" });
+
+    expect(respuesta.status).toBe(404);
+    expect(await respuesta.text()).toBe("");
+  });
+
+  it("responde OPTIONS con 204 y anuncia los métodos admitidos", async () => {
+    const respuesta = await servidor.pedir("/materias", { method: "OPTIONS" });
+
+    expect(respuesta.status).toBe(204);
+    expect(respuesta.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
+    expect(await respuesta.text()).toBe("");
+  });
+
+  it("responde 405 —y no 404— cuando la ruta existe pero el método no", async () => {
+    const respuesta = await servidor.pedir("/materias", { method: "DELETE" });
+
+    expect(respuesta.status).toBe(405);
+    expect(respuesta.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
+    expect(await respuesta.json()).toEqual({ error: "Método no permitido" });
+  });
+
+  it("distingue el método admitido en cada ruta: /inscripciones sólo acepta POST", async () => {
+    const respuesta = await servidor.pedir("/inscripciones");
+
+    expect(respuesta.status).toBe(405);
+    expect(respuesta.headers.get("allow")).toBe("POST, OPTIONS");
+  });
+
+  it("declara Content-Length en las respuestas con cuerpo", async () => {
+    const respuesta = await servidor.pedir("/salud");
+    const bytes = Buffer.byteLength(await respuesta.text(), "utf8");
+
+    expect(respuesta.headers.get("content-length")).toBe(String(bytes));
+    expect(respuesta.headers.get("transfer-encoding")).toBeNull();
+  });
+});
