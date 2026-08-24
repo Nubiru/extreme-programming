@@ -36,7 +36,16 @@ Para cambiar el puerto: `PORT=4000 npm start`.
 | `GET`  | `/estudiantes/:id`            | `200` el estudiante · `400` id no entero · `404` no existe |
 | `GET`  | `/estudiantes/:id/inscripciones` | `200` inscripciones del estudiante · `404` no existe |
 | `POST` | `/inscripciones`              | `201` inscripción creada · ver tabla de rechazos        |
-| —      | cualquier otra                | `404` con un mensaje de error                           |
+| `HEAD` | cualquier ruta de `GET`       | los mismos encabezados que `GET`, sin cuerpo            |
+| `OPTIONS` | cualquier ruta conocida    | `204` con `Allow` listando los métodos admitidos        |
+| otro   | ruta conocida                 | `405` con `Allow`: la ruta existe, la operación no      |
+| —      | ruta desconocida              | `404` con un mensaje de error                           |
+
+`HEAD` se resuelve con el mismo manejador que `GET` y se omite el cuerpo al escribir
+la respuesta, así que ninguna ruta puede quedar con `GET` y sin `HEAD`. Todas las
+respuestas con cuerpo declaran `Content-Length`: es la única forma que tiene el
+cliente de saber dónde termina el mensaje, porque TCP entrega un flujo de bytes sin
+marcas de fin. `HEAD` existe justamente para pedir ese dato sin transferir el cuerpo.
 
 ### `POST /inscripciones`
 
@@ -81,6 +90,19 @@ curl -i -X POST http://localhost:3000/inscripciones \
 curl -i http://localhost:3000/estudiantes/1/inscripciones
 ```
 
+## Demostración con analizador de paquetes
+
+```bash
+./demo/captura-http.sh              # captura + 21 solicitudes (pide sudo)
+./demo/captura-http.sh --sin-captura # sólo las solicitudes, sin sudo
+```
+
+Levanta el servidor, ejercita el contrato completo con `curl -i` y captura el tráfico
+con `tshark` para abrirlo con Wireshark. El guion de la clase —qué instalar, qué
+mostrar y cómo leer la captura capa por capa— está en
+[`demo/GUION-DEMO.md`](demo/GUION-DEMO.md); la salida de una corrida real quedó en
+[`demo/sesion-ejemplo.txt`](demo/sesion-ejemplo.txt).
+
 ## Estructura
 
 ```
@@ -96,11 +118,17 @@ unidad-1/
 │   ├── pruebas/servidor-de-prueba.ts   levanta la app en un puerto libre
 │   ├── pruebas/suma.fixture.ts         ejemplos compartidos por los dos niveles
 │   └── servidor.ts                     punto de entrada: sólo escucha
+├── demo/                               ← demostración para la clase
+│   ├── captura-http.sh                 levanta, ejercita y captura el tráfico
+│   ├── GUION-DEMO.md                   qué instalar y cómo leer la captura
+│   └── sesion-ejemplo.txt              transcripción de una corrida real
 ├── features/                           ← lo que Cucumber necesita
 │   ├── inscripciones.feature           @api · escenarios sobre el contrato HTTP
+│   ├── metodos-http.feature            @api · HEAD, OPTIONS y 405
 │   ├── suma.feature                    @dominio · escenarios sobre la función
 │   ├── pasos/                          definiciones de pasos
 │   │   ├── inscripciones.pasos.ts
+│   │   ├── metodos.pasos.ts
 │   │   └── suma.pasos.ts
 │   └── soporte/mundo.ts                estado compartido por escenario y hooks
 ├── cucumber.json                       rutas, glob de pasos y formato

@@ -58,12 +58,49 @@ porque el criterio acordado sólo excluye `NaN`. Hay una prueba que fija esa
 conducta en un bloque llamado *"límites todavía sin acordar con el cliente"*:
 si mañana se decide rechazarlo, la prueba falla y obliga a la conversación.
 
+## Tercera historia: métodos y encabezados (`HEAD`, `OPTIONS`, `405`)
+
+Motivo: la demostración con analizador de paquetes. Al probar `curl -I` contra el
+servidor apareció un defecto real que ninguna prueba cubría: **`HEAD /salud`
+respondía `404`**. El manejador comparaba `solicitud.method === "GET"`, así que
+todas las rutas conocidas eran invisibles para `HEAD`.
+
+| # | Fase | Acción | Salida observada |
+|---|------|--------|------------------|
+| 1 | Descubrimiento | `curl -I http://localhost:3000/salud` contra el servidor real | `HTTP/1.1 404 Not Found` |
+| 2 | **Rojo (unitario)** | 7 pruebas nuevas en `aplicacion.test.ts` antes de tocar el código | `6 failed | 58 passed (64)` |
+| 3 | Verde | Tabla `RUTAS`, `HEAD` resuelto como `GET`, `Content-Length`, `OPTIONS` y `405` | `64 passed (64)` |
+| 4 | Aceptación | `features/metodos-http.feature`: 7 escenarios | `23 scenarios · 105 steps` en verde |
+
+**Nota honesta sobre el orden.** Acá el rojo se capturó en el nivel unitario, no en
+el de aceptación: los escenarios de `metodos-http.feature` se escribieron después de
+la implementación, para dejar el contrato expresado en el lenguaje de la demo. Para
+que no queden como pruebas que "pasan porque sí", se verificaron por mutación.
+
+**Mutación.** Se revirtió la línea que resuelve `HEAD` como `GET`:
+
+```ts
+const metodo = metodoSolicitado;   // en vez de: esHead ? "GET" : metodoSolicitado
+```
+
+| | Unitarias | Aceptación |
+|---|---|---|
+| `HEAD` deja de resolverse como `GET` | ✅ 2 pruebas fallan | ✅ 2 escenarios fallan |
+
+**Segundo defecto, encontrado ejecutando la demo.** La primera corrida de
+`demo/captura-http.sh` mostró respuestas viejas —`Transfer-Encoding: chunked`,
+`HEAD` con `404`— porque había quedado un servidor anterior escuchando en el puerto
+3000: `node` terminó con `EADDRINUSE` y `curl` le habló al proceso ajeno sin que
+nada avisara. El script ahora verifica que el puerto esté libre antes de arrancar y
+corta con un mensaje. Es el mismo punto de la sección 3 de la consigna —dos procesos
+no pueden escuchar el mismo puerto— visto como un fallo concreto.
+
 ## Estado final
 
 ```
 tsc --noEmit          sin errores
-vitest run            3 archivos · 57 pruebas en verde
-cucumber-js           16 escenarios · 68 pasos en verde
+vitest run            3 archivos · 64 pruebas en verde
+cucumber-js           23 escenarios · 105 pasos en verde
 cobertura             100 % líneas · 96,34 % ramas
 ```
 
