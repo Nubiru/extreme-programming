@@ -1,0 +1,7 @@
+{
+  "default": {
+    "paths": ["features/**/*.feature"],
+    "import": ["features/soporte/*.ts", "features/pasos/*.ts"],
+    "format": ["progress"]
+  }
+}

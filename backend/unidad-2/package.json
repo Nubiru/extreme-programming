@@ -1,0 +1,27 @@
+{
+  "name": "unidad-2-api-crud",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --experimental-transform-types --watch src/server.ts",
+    "start": "node --experimental-transform-types src/server.ts",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "aceptacion": "NODE_OPTIONS=--experimental-transform-types cucumber-js",
+    "verificar": "npm run check && npm test && npm run aceptacion"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.2.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.20.1",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
