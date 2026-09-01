@@ -29,3 +29,14 @@ AgilePG_SPA.pdf
 backend/unidad-1/demo/salida/
 *.pcapng
 *.pcap
+
+# Clon de trabajo del repositorio ajeno que analizamos (Cas0570/Smart-Shopper).
+# No se versiona: se reconstruye con
+#   git clone https://github.com/Cas0570/Smart-Shopper.git "analisis/smart-shopper"
+# El análisis propio sí queda versionado en analisis/*.md
+analisis/smart-shopper/
+
+# Base de datos SQLite de la unidad 2: se crea sola al arrancar el servidor
+# (las pruebas usan :memory:). El esquema vive en backend/unidad-2/src/db/.
+*.db
+*.db-journal
