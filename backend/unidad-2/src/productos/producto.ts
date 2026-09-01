@@ -6,3 +6,4 @@ export interface Producto {
   stock: number;
   fechaCreacion: string;
 }
+console.log('producto.ts');

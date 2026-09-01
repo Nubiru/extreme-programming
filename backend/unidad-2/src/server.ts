@@ -20,6 +20,6 @@ const app = crearApp({ productosService, pedidosService });
 
 const puerto = Number(process.env.PORT ?? 3000);
 app.listen(puerto, () => {
-  console.log("app")
+  console.log("server")
   console.log(`API disponible en http://localhost:${puerto}/api/v1`);
 });
